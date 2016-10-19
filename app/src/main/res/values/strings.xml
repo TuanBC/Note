@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Note</string>
+    <string name="enter_title">Title</string>
+    <string name="enter_content">Content</string>
+    <string name="title_home">Home</string>
+    <string name="title_setting">Setting</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="title_activity_note_editor">NoteEditor</string>
+</resources>

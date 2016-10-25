@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ import java.util.List;
 
 import cmc.note.R;
 import cmc.note.activities.MainActivity;
+import cmc.note.activities.NoteEditorActivity;
 import cmc.note.adapter.ChecklistOptionsListAdapter;
 import cmc.note.data.ChecklistManager;
 import cmc.note.data.NoteManager;
@@ -111,6 +113,8 @@ public class ChecklistEditorFragment extends Fragment {
 
         if (mCurrentNote!=null)
             mCurrentItems = ChecklistManager.newInstance(getActivity()).getChecklistItemByNoteId(mCurrentNote.getId());
+
+        //other wise mCurrentItems=<>
 
         mAdapter = new ChecklistOptionsListAdapter(mCurrentItems, getActivity());
         mRecyclerView.setAdapter(mAdapter);
@@ -258,5 +262,53 @@ public class ChecklistEditorFragment extends Fragment {
 
     private void makeToast(String s) {
         Toast.makeText(getActivity(), s, Toast.LENGTH_SHORT).show();
+    }
+
+    public void promptToAddItem(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+
+        final EditText input = new EditText(getActivity());
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        alertDialog.setView(input); // uncomment this line
+        alertDialog.setTitle("Add Item ");
+        alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (input.getText().toString().equals("")){dialog.dismiss();}
+                else {
+                    CheckItem item = new CheckItem();
+                    item.setName(input.getText().toString());
+                    item.setNoteId(0);
+                    mCurrentItems.add(item);
+                    ChecklistManager.newInstance(getActivity()).create(item);
+
+                    if (mCurrentNote!=null)
+                        ChecklistManager.newInstance(getActivity()).getChecklistItemByNoteId(mCurrentNote.getId());
+//                    else ChecklistManager.newInstance(NoteEditorActivity.this).getChecklistItemByNoteId((long) 0);
+                }
+            }
+        });
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alertDialog.setNeutralButton("Next", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                if (input.getText()==null){dialog.dismiss();}
+                else {
+                    CheckItem item = new CheckItem();
+                    item.setName(input.getText().toString());
+                    ChecklistManager.newInstance(getActivity()).create(item);
+                    promptToAddItem();
+                }
+            }
+        });
+        alertDialog.show();
     }
 }

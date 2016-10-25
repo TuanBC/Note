@@ -12,7 +12,7 @@ import android.support.annotation.NonNull;
 public class CheckItem {
     public static final String TABLE_NAME = "check_items";
 
-    public static final String COL_ID = "id";
+    public static final String COL_ID = "_id";
     public static final String COL_NOTEID = "note_id";
     public static final String COL_NAME = "name";
     public static final String COL_STATUS = "status";

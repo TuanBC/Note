@@ -27,6 +27,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + Constants.NOTE_COL_MODIFIED_TIME + " integer not null "
             + ")";
 
+    private static final String CREATE_TABLE_CHECKLIST = "create table "
+            + Constants.CL_TABLE
+            + "("
+            + Constants.CL_COL_ID + " integer primary key autoincrement, "
+            + Constants.CL_COL_NOTEID + " integer not null, "
+            + Constants.CL_COL_NAME + " text, "
+            + Constants.CL_COL_STATUS + " integer not null "
+            + ")";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -35,7 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_NOTE);
-        db.execSQL(CheckItem.getSql());
+        db.execSQL(CREATE_TABLE_CHECKLIST);
     }
 
     @Override

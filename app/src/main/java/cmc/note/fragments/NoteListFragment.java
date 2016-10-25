@@ -115,9 +115,6 @@ public class NoteListFragment extends Fragment implements SwipeRefreshLayout.OnR
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.action_add:
-                    startActivity(new Intent(getActivity(), NoteEditorActivity.class));
-                break;
             case R.id.action_search:
 
                 break;

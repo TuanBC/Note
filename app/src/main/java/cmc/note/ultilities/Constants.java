@@ -23,7 +23,7 @@ public class Constants {
             Constants.NOTE_COL_MODIFIED_TIME
     };
 
-    public static final String CL_TABLE = "checklist";
+    public static final String CL_TABLE = "check_items";
 
     public static final String CL_COL_ID = "_id";
     public static final String CL_COL_NOTEID = "note_id";

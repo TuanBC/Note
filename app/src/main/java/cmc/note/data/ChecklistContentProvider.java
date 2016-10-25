@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -16,29 +15,30 @@ import java.util.HashSet;
 import cmc.note.ultilities.Constants;
 
 /**
- * Created by tuanb on 12-Oct-16.
+ * Created by tuanb on 21-Oct-16.
  */
-public class NoteContentProvider extends ContentProvider {
+
+public class ChecklistContentProvider extends ContentProvider{
     private DatabaseHelper dbHelper;                                       //Connect with the database
 
-    private static final String BASE_PATH_NOTE = "note";
+    private static final String BASE_PATH_CHECKLIST = "checklist";
     private static final String AUTHORITY = "cmc.note.data.provider";
-    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_NOTE);
-    private static final int NOTE = 100;
-    private static final int NOTES = 101;
+    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_CHECKLIST);
+    private static final int ITEM = 100;
+    private static final int ITEMS = 101;
 
     private static final UriMatcher URI_MATCHER = new UriMatcher(UriMatcher.NO_MATCH);
     static {
-        URI_MATCHER.addURI(AUTHORITY, BASE_PATH_NOTE, NOTES);
-        URI_MATCHER.addURI(AUTHORITY, BASE_PATH_NOTE + "/#", NOTE);
+        URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CHECKLIST, ITEMS);
+        URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CHECKLIST + "/#", ITEM);
     }
 
     private void checkColumns(String[] projection) {
         if (projection != null) {
             HashSet<String> request = new HashSet<String>(Arrays.asList(projection));
-            HashSet<String> available = new HashSet<String>(Arrays.asList(Constants.NOTE_COLUMNS));
+            HashSet<String> available = new HashSet<String>(Arrays.asList(Constants.CL_COLUMNS));
             if (!available.containsAll(request)) {
-                throw new IllegalArgumentException("Unknown columns in projection");
+                throw new IllegalArgumentException("Unknown columns in projection - checklist");
             }
         }
     }
@@ -56,11 +56,11 @@ public class NoteContentProvider extends ContentProvider {
 
         int type = URI_MATCHER.match(uri);
         switch (type){
-            case NOTES:
-                queryBuilder.setTables(Constants.NOTES_TABLE);
-            break;
-            case NOTE:
-                queryBuilder.setTables(Constants.NOTES_TABLE);
+            case ITEMS:
+                queryBuilder.setTables(Constants.CL_TABLE);
+                break;
+            case ITEM:
+                queryBuilder.setTables(Constants.CL_TABLE);
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -81,43 +81,15 @@ public class NoteContentProvider extends ContentProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         Long id;
         switch (type){
-            case NOTES:
-                id = db.insert(Constants.NOTES_TABLE, null, values);
+            case ITEMS:
+                id = db.insert(Constants.CL_TABLE, null, values);
                 break;
             default:
-                throw new IllegalArgumentException("Unknown URI at notecontent: " + uri);
+                throw new IllegalArgumentException("Unknown URI at CL: " + uri);
         }
         getContext().getContentResolver().notifyChange(uri, null);
-        return Uri.parse(BASE_PATH_NOTE + "/" + id);
+        return Uri.parse(BASE_PATH_CHECKLIST + "/" + id);
     }
-
-
-    @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
-        int type = URI_MATCHER.match(uri);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int affectedRows;
-        switch (type) {
-            case NOTES:
-                affectedRows = db.delete(Constants.NOTES_TABLE, selection, selectionArgs);
-                break;
-
-            case NOTE:
-                String id = uri.getLastPathSegment();
-                if (TextUtils.isEmpty(selection)) {
-                    affectedRows = db.delete(Constants.NOTES_TABLE, Constants.NOTE_COL_ID + "=" + id, null);
-                } else {
-                    affectedRows = db.delete(Constants.NOTES_TABLE, Constants.NOTE_COL_ID + "=" + id + " and " + selection, selectionArgs);
-                }
-                break;
-
-            default:
-                throw new IllegalArgumentException("Unknown URI: " + uri);
-        }
-        getContext().getContentResolver().notifyChange(uri, null);
-        return affectedRows;
-    }
-
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
@@ -125,16 +97,16 @@ public class NoteContentProvider extends ContentProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int affectedRows;
         switch (type) {
-            case NOTES:
-                affectedRows = db.update(Constants.NOTES_TABLE, values, selection, selectionArgs);
+            case ITEMS:
+                affectedRows = db.update(Constants.CL_TABLE, values, selection, selectionArgs);
                 break;
 
-            case NOTE:
+            case ITEM:
                 String id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
-                    affectedRows = db.update(Constants.NOTES_TABLE, values, Constants.NOTE_COL_ID + "=" + id, null);
+                    affectedRows = db.update(Constants.CL_TABLE, values, Constants.CL_COL_ID + "=" + id, null);
                 } else {
-                    affectedRows = db.update(Constants.NOTES_TABLE, values, Constants.NOTE_COL_ID + "=" + id + " and " + selection, selectionArgs);
+                    affectedRows = db.update(Constants.CL_TABLE, values, Constants.CL_COL_ID + "=" + id + " and " + selection, selectionArgs);
                 }
                 break;
 
@@ -144,4 +116,33 @@ public class NoteContentProvider extends ContentProvider {
         getContext().getContentResolver().notifyChange(uri, null);
         return affectedRows;
     }
+
+    @Override
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
+        int type = URI_MATCHER.match(uri);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int affectedRows;
+        switch (type) {
+            case ITEMS:
+                affectedRows = db.delete(Constants.CL_TABLE, selection, selectionArgs);
+                break;
+
+            case ITEM:
+                String id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)) {
+                    affectedRows = db.delete(Constants.CL_TABLE, Constants.CL_COL_ID + "=" + id, null);
+                } else {
+                    affectedRows = db.delete(Constants.CL_TABLE, Constants.CL_COL_ID + "=" + id + " and " + selection, selectionArgs);
+                }
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown URI: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return affectedRows;
+    }
+
+
+
 }

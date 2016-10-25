@@ -1,27 +1,18 @@
 package cmc.note.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import cmc.note.R;
-import cmc.note.activities.MainActivity;
-import cmc.note.activities.NoteEditorActivity;
 import cmc.note.models.Note;
-
-import static android.support.v4.app.ActivityCompat.startActivity;
 
 /**
 * Created by tuanb on 10-Oct-16.
@@ -46,7 +37,7 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.noteTitle.setText(mNotes.get(position).getTitle());
-        holder.noteModifyDate.setText(getReadableModifiedDate(mNotes.get(position).getDateModified()));
+        holder.noteModifiedDate.setText(getReadableModifiedDate(mNotes.get(position).getDateModified()));
     }
 
     @Override
@@ -56,12 +47,12 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHo
 
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public final TextView noteTitle, noteModifyDate;
+        public final TextView noteTitle, noteModifiedDate;
 
         public ViewHolder(View itemView) {
             super(itemView);
             noteTitle = (TextView)itemView.findViewById(R.id.text_view_note_title);
-            noteModifyDate = (TextView)itemView.findViewById(R.id.text_view_note_date);
+            noteModifiedDate = (TextView)itemView.findViewById(R.id.text_view_note_date);
 
 //            itemView.setOnClickListener(new View.OnClickListener() {
 //                @Override
@@ -86,11 +77,9 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHo
 //                }
 //            });
         }
-
     }
 
     private static String getReadableModifiedDate(long date){
         return new SimpleDateFormat("MMM dd, yyyy - h:mm a").format(new Date(date));
     }
-
 }

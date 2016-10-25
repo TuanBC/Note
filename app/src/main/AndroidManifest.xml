@@ -24,9 +24,6 @@
                 android:value="cmc.note.activities.MainActivity" />
         </activity>
 
-
-
-
         <provider
             android:authorities="cmc.note.data.provider"
             android:name=".data.NoteContentProvider"

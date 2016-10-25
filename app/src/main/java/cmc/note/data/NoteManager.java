@@ -36,9 +36,11 @@ public class NoteManager {
     //(C)RUD
     public long create(Note note) {
         ContentValues values = new ContentValues();
-        values.put(Constants.COLUMN_TITLE, note.getTitle());
-        values.put(Constants.COLUMN_CONTENT, note.getContent());
-        values.put(Constants.COLUMN_MODIFIED_TIME, System.currentTimeMillis());
+        values.put(Constants.NOTE_COL_TITLE, note.getTitle());
+        values.put(Constants.NOTE_COL_CONTENT, note.getContent());
+        values.put(Constants.NOTE_COL_CREATED_TIME, System.currentTimeMillis());
+        values.put(Constants.NOTE_COL_MODIFIED_TIME, System.currentTimeMillis());
+        values.put(Constants.NOTE_COL_TYPE, note.getType());
         Uri result = mContext.getContentResolver().insert(NoteContentProvider.CONTENT_URI, values);
         long id = Long.parseLong(result.getLastPathSegment());
         return id;
@@ -47,7 +49,7 @@ public class NoteManager {
     //C(R)UD
     public List<Note> getAllNotes() {
         List<Note> notes = new ArrayList<>();
-        Cursor cursor = mContext.getContentResolver().query(NoteContentProvider.CONTENT_URI, Constants.COLUMNS, null , null, null);
+        Cursor cursor = mContext.getContentResolver().query(NoteContentProvider.CONTENT_URI, Constants.NOTE_COLUMNS, null , null, null);
         if (cursor != null){
             if (cursor.moveToFirst()){
                 while(!cursor.isAfterLast()){
@@ -65,9 +67,24 @@ public class NoteManager {
     public Note getNote(Long id) {
         Note note;
         Cursor cursor = mContext.getContentResolver().query(NoteContentProvider.CONTENT_URI,
-                Constants.COLUMNS, Constants.COLUMN_ID + " = " + id, null, null);
+                Constants.NOTE_COLUMNS, Constants.NOTE_COL_ID + " = " + id, null, null);
 
         Log.i("Log Cursor", "at " + id);
+
+        if (cursor != null){
+            cursor.moveToFirst();
+            note = Note.getNotefromCursor(cursor);
+            return note;
+        }
+        return null;
+    }
+
+    public Note getNoteByTitle(String title) {
+        Note note;
+        Cursor cursor = mContext.getApplicationContext().getContentResolver().query(NoteContentProvider.CONTENT_URI,
+                Constants.NOTE_COLUMNS, Constants.NOTE_COL_TITLE + " = " + title, null, null);
+
+        Log.i("Log Cursor", "at " + title);
 
         if (cursor != null){
             cursor.moveToFirst();
@@ -80,19 +97,18 @@ public class NoteManager {
     //CR(U)D
     public void update(Note note) {
         ContentValues values = new ContentValues();
-        values.put(Constants.COLUMN_TITLE, note.getTitle());
-        values.put(Constants.COLUMN_CONTENT, note.getContent());
-        values.put(Constants.COLUMN_MODIFIED_TIME, System.currentTimeMillis());
-        mContext.getContentResolver().update(NoteContentProvider.CONTENT_URI,
-                values, Constants.COLUMN_ID  + "=" + note.getId(), null);
+        values.put(Constants.NOTE_COL_TITLE, note.getTitle());
+        values.put(Constants.NOTE_COL_CONTENT, note.getContent());
+        values.put(Constants.NOTE_COL_CREATED_TIME, note.getDateCreated());
+        values.put(Constants.NOTE_COL_MODIFIED_TIME, System.currentTimeMillis());
+        mContext.getApplicationContext().getContentResolver().update(NoteContentProvider.CONTENT_URI,
+                values, Constants.NOTE_COL_ID + "=" + note.getId(), null);
 
     }
 
     //CRU(D)
     public void delete(Note note) {
         mContext.getContentResolver().delete(
-                NoteContentProvider.CONTENT_URI, Constants.COLUMN_ID + "=" + note.getId(), null);
+                NoteContentProvider.CONTENT_URI, Constants.NOTE_COL_ID + "=" + note.getId(), null);
     }
-
-
 }

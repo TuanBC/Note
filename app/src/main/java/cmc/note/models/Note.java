@@ -12,7 +12,9 @@ public class Note {
     private Long id;
     private String title;
     private String content;
+    private long dateCreated;
     private long dateModified;
+    private String type;
 
     public String getContent() {
         return content;
@@ -20,6 +22,14 @@ public class Note {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public long getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(long dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
     public long getDateModified() {
@@ -38,6 +48,14 @@ public class Note {
         this.id = id;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -48,10 +66,12 @@ public class Note {
 
     public static Note getNotefromCursor(Cursor cursor){
         Note note = new Note();
-        note.setId(cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_ID)));
-        note.setTitle(cursor.getString(cursor.getColumnIndex(Constants.COLUMN_TITLE)));
-        note.setContent(cursor.getString(cursor.getColumnIndex(Constants.COLUMN_CONTENT)));
-        note.setDateModified(cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_MODIFIED_TIME)));
+        note.setId(cursor.getLong(cursor.getColumnIndex(Constants.NOTE_COL_ID)));
+        note.setTitle(cursor.getString(cursor.getColumnIndex(Constants.NOTE_COL_TITLE)));
+        note.setContent(cursor.getString(cursor.getColumnIndex(Constants.NOTE_COL_CONTENT)));
+        note.setType(cursor.getString(cursor.getColumnIndex(Constants.NOTE_COL_TYPE)));
+        note.setDateCreated(cursor.getLong(cursor.getColumnIndex(Constants.NOTE_COL_CREATED_TIME)));
+        note.setDateModified(cursor.getLong(cursor.getColumnIndex(Constants.NOTE_COL_MODIFIED_TIME)));
 
         return note;
     }

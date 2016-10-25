@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/note_editor"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingLeft="@dimen/margin_padding_tiny"
-    android:paddingRight="@dimen/margin_padding_tiny">
-
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:orientation="horizontal"
@@ -40,18 +34,17 @@
         android:padding="@dimen/margin_padding_tiny"
         android:singleLine="true"
         android:textColor="#000000"/>
-
-    <cmc.note.models.LinedEditText
-        android:id="@+id/edit_text_note"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:capitalize="sentences"
-        android:fadingEdge="vertical"
-        android:gravity="top"
-        android:hint="@string/enter_content"
-        android:inputType="textMultiLine"
-        android:padding="@dimen/margin_padding_small"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/checklist_options_recycler_view"
         android:scrollbars="vertical"
-        android:textSize="@dimen/text_size_xnormal"/>
+        android:background="@android:color/transparent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
+    <Button
+        android:text="New Item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_add_checkItem"
+        android:onClick="onClickListener"/>
 </LinearLayout>

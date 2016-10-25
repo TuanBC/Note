@@ -1,11 +1,19 @@
 package cmc.note.activities;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
@@ -22,7 +30,6 @@ import cmc.note.fragments.NoteListFragment;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
-    private com.mikepenz.materialdrawer.Drawer result = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +49,13 @@ public class MainActivity extends AppCompatActivity {
             openFragment(fragment, "Note List");
         }
 
+        findViewById(R.id.btn_add_note).setOnClickListener(button_listener);
+        findViewById(R.id.btn_add_checklist).setOnClickListener(button_listener);
+        findViewById(R.id.btn_add_photo).setOnClickListener(button_listener);
+
 
         //Now build the navigation drawer and pass the AccountHeader
-        result = new DrawerBuilder()
+        com.mikepenz.materialdrawer.Drawer result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(mToolbar)
                 .withActionBarDrawerToggle(true)
@@ -99,6 +110,24 @@ public class MainActivity extends AppCompatActivity {
                 .build();
     }
 
+    private View.OnClickListener button_listener = new View.OnClickListener() {
+        public void onClick(View v) {
+            Intent editorIntent = new Intent(MainActivity.this, NoteEditorActivity.class);
+            switch (v.getId()){
+                case R.id.btn_add_note:
+                    editorIntent.putExtra("type", "note");
+                    startActivity(editorIntent);
+
+                    break;
+                case R.id.btn_add_checklist:
+                    editorIntent.putExtra("type", "checklist");
+                    startActivity(editorIntent);
+
+                    break;
+            }
+        }
+    };
+
     private void openFragment(final Fragment fragment, String title){
         getSupportFragmentManager()
                 .beginTransaction()
@@ -107,6 +136,41 @@ public class MainActivity extends AppCompatActivity {
                 .addToBackStack(null)
                 .commit();
         getSupportActionBar().setTitle(title);
+    }
+
+    public void showNoticeDialog() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new NoticeDialogFragment();
+        dialog.show(getSupportFragmentManager(), "NoticeDialogFragment");
+    }
+
+    public static class NoticeDialogFragment extends DialogFragment {
+
+        /* The activity that creates an instance of this dialog fragment must
+         * implement this interface in order to receive event callbacks.
+         * Each method passes the DialogFragment in case the host needs to query it. */
+        public interface NoticeDialogListener {
+            public void onDialogPositiveClick(DialogFragment dialog);
+            public void onDialogNegativeClick(DialogFragment dialog);
+        }
+
+        // Use this instance of the interface to deliver action events
+        NoticeDialogListener mListener;
+
+        // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            // Verify that the host activity implements the callback interface
+            try {
+                // Instantiate the NoticeDialogListener so we can send events to the host
+                mListener = (NoticeDialogListener) activity;
+            } catch (ClassCastException e) {
+                // The activity doesn't implement the interface, throw exception
+                throw new ClassCastException(activity.toString()
+                        + " must implement NoticeDialogListener");
+            }
+        }
     }
 
 }

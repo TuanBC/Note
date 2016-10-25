@@ -1,25 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/activity_main"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cmc.note.activities.MainActivity">
+
+
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"/>
+
+    <FrameLayout
+        android:id="@+id/container"
+        android:tag="container"
+        android:layout_below="@+id/toolbar"
+        android:layout_weight="1"
+        android:padding="@dimen/margin_padding_xtiny"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="cmc.note.activities.MainActivity">
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:layout_above="@+id/buttons" />
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttons"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
 
-        <include
-            android:id="@+id/toolbar"
-            layout="@layout/toolbar"/>
+        <Button
+            android:text="Note"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_add_note"
+            android:layout_weight="1"/>
 
-        <FrameLayout
-            android:id="@+id/container"
-            android:layout_below="@+id/toolbar"
-            android:layout_weight="1"
-            android:padding="@dimen/margin_padding_xtiny"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clickable="true"
-            android:onClick=""/>
-    </RelativeLayout>
+        <Button
+            android:text="Checklist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_add_checklist"
+            android:layout_weight="1"/>
+
+        <Button
+            android:text="Photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_add_photo"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,8 +1,11 @@
 package cmc.note.fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,9 +18,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.app.Fragment;
+import android.widget.Button;
+import android.widget.Toast;
+
 import java.util.List;
 
 import cmc.note.R;
+import cmc.note.activities.MainActivity;
 import cmc.note.activities.NoteEditorActivity;
 import cmc.note.adapter.NoteListAdapter;
 import cmc.note.data.NoteManager;
@@ -52,15 +59,6 @@ public class NoteListFragment extends Fragment implements SwipeRefreshLayout.OnR
         setupList();
 
         return mRootView;
-
-        //ADD NOTES
-        //attach an onClick listener to the Floating Action Button
-//        mFab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(new Intent(getActivity(), NoteEditorActivity.class));
-//            }
-//        });
     }
 
     private void setupList() {
@@ -73,44 +71,32 @@ public class NoteListFragment extends Fragment implements SwipeRefreshLayout.OnR
         mAdapter = new NoteListAdapter(mNotes, getActivity());
         mRecyclerView.setAdapter(mAdapter);
 
-        final GestureDetector mGestureDetector =
-                new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
-                    @Override
-                    public boolean onSingleTapUp(MotionEvent e) {
-                        return true;
-                    }
-                });
-
-        mRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getContext(),
+                mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
-            public boolean onInterceptTouchEvent(RecyclerView recyclerView, MotionEvent motionEvent) {
-                View child = recyclerView.findChildViewUnder(motionEvent.getX(), motionEvent.getY());
+            public void onItemClick(View view, final int position) {
+                //Values are passing to activity & to fragment as well
+                Log.i("LOG","LOG ITEM ONCLICK" + position);
 
-                if (child != null && mGestureDetector.onTouchEvent(motionEvent)) {
-                    int position = recyclerView.getChildLayoutPosition(child);
-                    Note selectedNote = mNotes.get(position);
-                    Log.i("Log recycler view", selectedNote.getId().toString());
+                Note selectedNote = mNotes.get(position);
 
-                    Intent editorIntent = new Intent(getActivity(), NoteEditorActivity.class);
-                    editorIntent.putExtra("id", selectedNote.getId());
+                Intent editorIntent = new Intent(getActivity(), NoteEditorActivity.class);
+                editorIntent.putExtra("id", selectedNote.getId());
 
-                    startActivity(editorIntent);
-                }
-                return false;
+                startActivity(editorIntent);
             }
 
             @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
+            public void onLongItemClick(View view, int position) {
+                confirmDialog();
             }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-            }
-        });
+        }));
     }
 
+    public void confirmDialog() {
+        DialogFragment newFragment = new ListDialogFragment();
+        newFragment.show(getFragmentManager(), "note options");
+    }
 
     //ADD MENU
     @Override
@@ -135,6 +121,7 @@ public class NoteListFragment extends Fragment implements SwipeRefreshLayout.OnR
             case R.id.action_search:
 
                 break;
+
         }
         return super.onOptionsItemSelected(item);
     }

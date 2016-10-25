@@ -1,10 +1,13 @@
 package cmc.note.fragments;
 
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,27 +20,35 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import cmc.note.R;
 import cmc.note.activities.MainActivity;
+import cmc.note.adapter.ChecklistOptionsListAdapter;
+import cmc.note.data.ChecklistManager;
 import cmc.note.data.NoteManager;
+import cmc.note.models.CheckItem;
 import cmc.note.models.Note;
 
 /**
- * Created by tuanb on 10-Oct-16.
+ * Created by tuanb on 20-Oct-16.
  */
 
-public class NoteLinedEditorFragment extends Fragment {
+public class ChecklistEditorFragment extends Fragment {
     private View mRootView;
     private EditText mTitleEditText;
-    private EditText mContentEditText;
     private Note mCurrentNote;
     private TextView mTimeAgo;
     private TextView mModifiedTime;
 
-    public NoteLinedEditorFragment() {
+    private RecyclerView mRecyclerView;
+    private ChecklistOptionsListAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    private List<CheckItem> mCurrentItems = new ArrayList<>();
+
+    public ChecklistEditorFragment() {
         // Required empty public constructor
     }
 
@@ -45,12 +56,24 @@ public class NoteLinedEditorFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        mRootView = inflater.inflate(R.layout.fragment_note_lined_editor, container, false);
+        mRootView = inflater.inflate(R.layout.fragment_checklist_editor, container, false);
         mTitleEditText = (EditText)mRootView.findViewById(R.id.edit_text_title);
-        mContentEditText = (EditText)mRootView.findViewById(R.id.edit_text_note);
         mTimeAgo = (TextView)mRootView.findViewById(R.id.time_ago);
         mModifiedTime = (TextView)mRootView.findViewById(R.id.modified_time);
+        setupList();
         return mRootView;
+    }
+
+    public static ChecklistEditorFragment newInstance(long id){
+        ChecklistEditorFragment fragment = new ChecklistEditorFragment();
+
+        if (id > 0){
+            Bundle bundle = new Bundle();
+            bundle.putLong("id", id);
+            fragment.setArguments(bundle);
+        }
+
+        return fragment;
     }
 
     @Override
@@ -60,20 +83,15 @@ public class NoteLinedEditorFragment extends Fragment {
         getCurrentNote();
     }
 
-    public static NoteLinedEditorFragment newInstance(long id){
-        NoteLinedEditorFragment fragment = new NoteLinedEditorFragment();
-
-        if (id > 0){
-            Bundle bundle = new Bundle();
-            bundle.putLong("id", id);
-            fragment.setArguments(bundle);
-            Log.i("NoteLinedEditorFragment", "done pushing id");
-        }
-
-        return fragment;
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.menu_note_edit, menu);
     }
 
-    private void getCurrentNote() {
+
+    private void getCurrentNote() {                     //Extract current note to get id => get appropriate check items
         Bundle args = getArguments();
         if (args != null && args.containsKey("id")) {
             Long id = args.getLong("id",0);
@@ -84,31 +102,83 @@ public class NoteLinedEditorFragment extends Fragment {
         }
     }
 
+
+    private void setupList() {
+        mRecyclerView = (RecyclerView) mRootView.findViewById(R.id.checklist_options_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        if (mCurrentNote!=null)
+            mCurrentItems = ChecklistManager.newInstance(getActivity()).getChecklistItemByNoteId(mCurrentNote.getId());
+
+        mAdapter = new ChecklistOptionsListAdapter(mCurrentItems, getActivity());
+        mRecyclerView.setAdapter(mAdapter);
+
+        mRecyclerView.addOnItemTouchListener(new RecyclerItemClickListener(getContext(),
+                mRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, final int position) {
+                //Values are passing to activity & to fragment as well
+                Log.i("LOG","LOG ITEM ONCLICK" + position);
+
+                CheckItem selectedItem = mCurrentItems.get(position);
+                selectedItem.check();
+            }
+
+            @Override
+            public void onLongItemClick(View view, int position) {
+
+            }
+        }));
+    }
+
+//    private LinearLayout addCheckItem() {
+//        LinearLayout checkitemLL = (LinearLayout) inflater.inflate(R.layout.row_checkitem, null);
+//        EditText itemEdit = (EditText) checkitemLL.findViewById(R.id.item_et);
+//        itemEdit.setTypeface(font);
+//        checklistLL.addView(checkitemLL);
+//
+//        return checkitemLL;
+//    }
+
+
+
+
     private boolean saveNote(){
-        String content = mContentEditText.getText().toString();
-        if (TextUtils.isEmpty(content)){
-            mContentEditText.setError("Content is required");
+        int size = mCurrentItems.size();
+        if (size==0){
+            mTitleEditText.setError("No checklist items included");
             return false;
         }
 
-        String title = mTitleEditText.getText().toString();         //DEFAULT TITLE = CONTENT
+        String title = mTitleEditText.getText().toString();
         if (TextUtils.isEmpty(title)){
-            title=content;
+            mTitleEditText.setError("Title required");
         }
 
-        if (mCurrentNote != null){
-            mCurrentNote.setContent(content);
+        if (mCurrentNote!=null){
             mCurrentNote.setTitle(title);
             NoteManager.newInstance(getActivity()).update(mCurrentNote);
+
+            for (CheckItem item : mCurrentItems){
+                item.setNoteId(mCurrentNote.getId());
+                ChecklistManager.newInstance(getActivity()).update(item);
+            }
 
             Intent intent = new Intent(getActivity(), MainActivity.class);
             startActivity(intent);
         }else {
             Note note = new Note();
             note.setTitle(title);
-            note.setType("note");
-            note.setContent(content);
+            note.setType("checklist");
             NoteManager.newInstance(getActivity()).create(note);
+
+            Note mNote = NoteManager.newInstance(getActivity()).getNoteByTitle(title);
+            for (CheckItem item : mCurrentItems){
+                item.setNoteId(mNote.getId());
+                ChecklistManager.newInstance(getActivity()).create(item);
+            }
 
             Intent intent = new Intent(getActivity(), MainActivity.class);
             startActivity(intent);
@@ -116,40 +186,6 @@ public class NoteLinedEditorFragment extends Fragment {
         return true;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mCurrentNote != null){
-            populateFields();
-        } else mModifiedTime.setText(getReadableDate(System.currentTimeMillis()));
-    }
-
-    //POPULATE INFO OF CURRENT NOTE TO EDIT NOTE
-    private void populateFields() {
-        mTitleEditText.setText(mCurrentNote.getTitle());
-        mContentEditText.setText(mCurrentNote.getContent());
-
-        //TIME
-        long temp_modified_time=mCurrentNote.getDateModified();
-        mModifiedTime.setText(getReadableDate(temp_modified_time));
-
-        long temp_time_ago = (System.currentTimeMillis() - temp_modified_time)/1000 ;
-        if (temp_time_ago < 60) mTimeAgo.setText(temp_time_ago + " seconds ago");
-        else if (temp_time_ago < 3600) mTimeAgo.setText(temp_time_ago/60 + " minute(s) ago");
-        else if (temp_time_ago < 86400) mTimeAgo.setText(temp_time_ago/3600 + " hour(s) ago");
-        else mTimeAgo.setText(temp_time_ago/86400 + " day(s) ago");
-    }
-
-    private static String getReadableDate(long date){
-        return new SimpleDateFormat("MMM dd, yyyy - h:mm a").format(new Date(date));
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
-        inflater.inflate(R.menu.menu_note_edit, menu);
-    }
 
     //MENU ONCLICK LISTENER
     @Override
@@ -181,6 +217,8 @@ public class NoteLinedEditorFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 NoteManager.newInstance(getActivity()).delete(mCurrentNote);
+                ChecklistManager.newInstance(getActivity()).deleteByNoteId(mCurrentNote.getId());
+
                 makeToast(titleOfNoteTobeDeleted + "deleted");
                 startActivity(new Intent(getActivity(), MainActivity.class));
             }
@@ -205,6 +243,7 @@ public class NoteLinedEditorFragment extends Fragment {
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                ChecklistManager.newInstance(getActivity()).deleteByNoteId((long) 0);
                 getActivity().finish();
             }
         });

@@ -43,6 +43,7 @@ public class NoteManager {
         values.put(Constants.NOTE_COL_TYPE, note.getType());
         Uri result = mContext.getContentResolver().insert(NoteContentProvider.CONTENT_URI, values);
         long id = Long.parseLong(result.getLastPathSegment());
+        Log.i("Log Cursor"," create note name  "+id + " "  );
         return id;
     }
 
@@ -82,7 +83,7 @@ public class NoteManager {
     public Note getNoteByTitle(String title) {
         Note note;
         Cursor cursor = mContext.getApplicationContext().getContentResolver().query(NoteContentProvider.CONTENT_URI,
-                Constants.NOTE_COLUMNS, Constants.NOTE_COL_TITLE + " = " + title, null, null);
+                Constants.NOTE_COLUMNS, Constants.NOTE_COL_TITLE + " = '" + title + "'", null, null);
 
         Log.i("Log Cursor", "at " + title);
 

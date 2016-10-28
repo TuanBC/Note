@@ -4,7 +4,7 @@
     android:padding="@dimen/margin_padding_small"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/material_drawer_accent"
+    android:background="@color/material_drawer_primary"
     android:layout_marginBottom="@dimen/dividerHeight">
 
     <TextView

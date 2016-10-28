@@ -25,6 +25,7 @@ public class NoteContentProvider extends android.content.ContentProvider {
     private static final String BASE_PATH_CHECK_ITEM = "check_items";
     private static final String AUTHORITY = "cmc.note.data.provider";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_NOTE);
+    public static final Uri CL_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_CHECK_ITEM);
     private static final int NOTE = 100;
     private static final int NOTES = 101;
     private static final int ITEM = 200;
@@ -38,16 +39,16 @@ public class NoteContentProvider extends android.content.ContentProvider {
         URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CHECK_ITEM, ITEMS);
         URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CHECK_ITEM + "/#", ITEM);
     }
-
-    private void checkColumns(String[] projection) {
-        if (projection != null) {
-            HashSet<String> request = new HashSet<>(Arrays.asList(projection));
-            HashSet<String> note_available = new HashSet<>(Arrays.asList(Constants.NOTE_COLUMNS));
-            if (!note_available.containsAll(request)) {
-                throw new IllegalArgumentException("Unknown columns (note) in projection");
-            }
-        }
-    }
+//
+//    private void checkColumns(String[] projection) {
+//        if (projection != null) {
+//            HashSet<String> request = new HashSet<>(Arrays.asList(projection));
+//            HashSet<String> note_available = new HashSet<>(Arrays.asList(Constants.NOTE_COLUMNS));
+//            if (!note_available.containsAll(request)) {
+//                throw new IllegalArgumentException("Unknown columns (note) in projection");
+//            }
+//        }
+//    }
 
     @Override
     public boolean onCreate() {

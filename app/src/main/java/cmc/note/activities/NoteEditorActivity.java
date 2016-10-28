@@ -43,31 +43,30 @@ public class NoteEditorActivity extends MainActivity {
 
         if (savedInstanceState == null){
             Bundle args = getIntent().getExtras();
-            if (args != null && args.containsKey("id")){
-                long id = args.getLong("id", 0);
+            if (args != null) {
+                if (args.containsKey("id")) {
+                    long id = args.getLong("id", 0);
 
-                Log.i("Note Editor", "got_index="+id);
+                    if (id > 0) { //OPEN SPECIFIC FRAGMENT WITH GIVEN ID
+                        mCurrentNote = NoteManager.newInstance(this).getNote(id);
 
-                if (id > 0){ //OPEN SPECIFIC FRAGMENT WITH GIVEN ID
-                    mCurrentNote = NoteManager.newInstance(this).getNote(id);
+                        if (mCurrentNote.getType().equals("checklist")) {
+                            openFragment(ChecklistEditorFragment.newInstance(id), "Checklist");
+                        } else if (mCurrentNote.getType().equals("note")) {
+                            openFragment(NoteLinedEditorFragment.newInstance(id), "Editor");
+                        }
+                    }
+                } else if (args.containsKey("type")) {
+                    String type = args.getString("type", "");
 
-                    Log.i("log", "note_type" + mCurrentNote.getType());
 
-                    if (mCurrentNote.getType().equals("checklist")){
-                        openFragment(ChecklistEditorFragment.newInstance(id), "Editor");
-                    } else if (mCurrentNote.getType().equals("note")){
-                        openFragment(NoteLinedEditorFragment.newInstance(id), "Editor");
+                    if (type.equals("note"))
+                        openFragment(NoteLinedEditorFragment.newInstance(0), "Editor");
+                    else if (type.equals("checklist")) {
+                        long checklist_id = args.getLong("checklist_id", 0);
+                        openFragment(ChecklistEditorFragment.newInstance(checklist_id), "Checklist");
                     }
                 }
-            }
-            else if (args != null && args.containsKey("type")){
-                String type = args.getString("type", "");
-                Log.i("Note Editor", "got_type="+type);
-
-                if (type.equals("note"))
-                    openFragment(NoteLinedEditorFragment.newInstance(0), "Editor");
-                else if (type.equals("checklist"))
-                    openFragment(ChecklistEditorFragment.newInstance(0), "Checklist");
             }
         }
     }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,19 +37,19 @@ public class ChecklistManager {
     //(C)RUD
     public long create(CheckItem item) {
         ContentValues values = new ContentValues();
-        values.put(Constants.CL_COL_ID, item.getId());
         values.put(Constants.CL_COL_NAME, item.getName());
-        values.put(Constants.CL_COL_NOTEID, 0);
+        values.put(Constants.CL_COL_NOTEID, item.getNoteId());
         values.put(Constants.CL_COL_STATUS, item.getStatus());
-        Uri result = clContext.getContentResolver().insert(NoteContentProvider.CONTENT_URI, values); //BUG: insert command points to notecontentprovider's one
+        Uri result = clContext.getContentResolver().insert(NoteContentProvider.CL_URI, values); //BUG: insert command points to notecontentprovider's one
         long id = Long.parseLong(result.getLastPathSegment());
+        Log.i("Log Cursor"," create note name " + item.getName() + " "+id + " " +item.getNoteId()+" "+item.getStatus() );
         return id;
     }
 
     //C(R)UD
     public CheckItem getChecklistItem(Long id) {
         CheckItem item;
-        Cursor cursor = clContext.getContentResolver().query(NoteContentProvider.CONTENT_URI,
+        Cursor cursor = clContext.getContentResolver().query(NoteContentProvider.CL_URI,
                 Constants.CL_COLUMNS, Constants.CL_COL_ID + " = " + id, null, null);
 
         Log.i("Log Cursor", "at " + id);
@@ -56,6 +57,7 @@ public class ChecklistManager {
         if (cursor != null){
             cursor.moveToFirst();
             item = CheckItem.getCheckItemfromCursor(cursor);
+            cursor.close();
             return item;
         }
         return null;
@@ -65,7 +67,7 @@ public class ChecklistManager {
     public List<CheckItem> getChecklistItemByNoteId(Long id) {
         List<CheckItem> checkItems = new ArrayList<>();
 
-        Cursor cursor = clContext.getContentResolver().query(NoteContentProvider.CONTENT_URI,
+        Cursor cursor = clContext.getContentResolver().query(NoteContentProvider.CL_URI,
                 Constants.CL_COLUMNS, Constants.CL_COL_NOTEID + " = " + id, null, null);
 
         Log.i("Log Cursor", "note_at " + id);
@@ -89,20 +91,18 @@ public class ChecklistManager {
         values.put(Constants.CL_COL_NAME, checkItem.getName());
         values.put(Constants.CL_COL_STATUS, checkItem.getStatus());
 
-        clContext.getContentResolver().update(NoteContentProvider.CONTENT_URI,
+        clContext.getContentResolver().update(NoteContentProvider.CL_URI,
                 values, Constants.CL_COL_ID + "=" + checkItem.getId(), null);
     }
 
     //CRU(D)
     public void delete(CheckItem checkItem) {
         clContext.getContentResolver().delete(
-                NoteContentProvider.CONTENT_URI, Constants.CL_COL_ID + "=" + checkItem.getId(), null);
+                NoteContentProvider.CL_URI, Constants.CL_COL_ID + "=" + checkItem.getId(), null);
     }
 
     public void deleteByNoteId(Long id){
         clContext.getContentResolver().delete(
-                NoteContentProvider.CONTENT_URI, Constants.CL_COL_NOTEID + "=" + id, null);
+                NoteContentProvider.CL_URI, Constants.CL_COL_NOTEID + "=" + id, null);
     }
-
-
 }

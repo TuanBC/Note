@@ -43,31 +43,30 @@ public class NoteEditorActivity extends MainActivity {
 
         if (savedInstanceState == null){
             Bundle args = getIntent().getExtras();
-            if (args != null && args.containsKey("id")){
-                long id = args.getLong("id", 0);
+            if (args != null) {
+                if (args.containsKey("id")) {
+                    long id = args.getLong("id", 0);
 
-                Log.i("Note Editor", "got_index="+id);
+                    if (id > 0) { //OPEN SPECIFIC FRAGMENT WITH GIVEN ID
+                        mCurrentNote = NoteManager.newInstance(this).getNote(id);
 
-                if (id > 0){ //OPEN SPECIFIC FRAGMENT WITH GIVEN ID
-                    mCurrentNote = NoteManager.newInstance(this).getNote(id);
+                        if (mCurrentNote.getType().equals("checklist")) {
+                            openFragment(ChecklistEditorFragment.newInstance(id), "Checklist");
+                        } else if (mCurrentNote.getType().equals("note")) {
+                            openFragment(NoteLinedEditorFragment.newInstance(id), "Editor");
+                        }
+                    }
+                } else if (args.containsKey("type")) {
+                    String type = args.getString("type", "");
 
-                    Log.i("log", "note_type" + mCurrentNote.getType());
 
-                    if (mCurrentNote.getType().equals("checklist")){
-                        openFragment(ChecklistEditorFragment.newInstance(id), "Editor");
-                    } else if (mCurrentNote.getType().equals("note")){
-                        openFragment(NoteLinedEditorFragment.newInstance(id), "Editor");
+                    if (type.equals("note"))
+                        openFragment(NoteLinedEditorFragment.newInstance(0), "Editor");
+                    else if (type.equals("checklist")) {
+                        long checklist_id = args.getLong("checklist_id", 0);
+                        openFragment(ChecklistEditorFragment.newInstance(checklist_id), "Checklist");
                     }
                 }
-            }
-            else if (args != null && args.containsKey("type")){
-                String type = args.getString("type", "");
-                Log.i("Note Editor", "got_type="+type);
-
-                if (type.equals("note"))
-                    openFragment(NoteLinedEditorFragment.newInstance(0), "Editor");
-                else if (type.equals("checklist"))
-                    openFragment(ChecklistEditorFragment.newInstance(0), "Checklist");
             }
         }
     }
@@ -86,54 +85,6 @@ public class NoteEditorActivity extends MainActivity {
         }
     }
 
-    public void promptToAddItem(){
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-
-        final EditText input = new EditText(this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        alertDialog.setView(input); // uncomment this line
-        alertDialog.setTitle("Add Item ");
-        alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (input.getText()==null){dialog.dismiss();}
-                else {
-                    CheckItem item = new CheckItem();
-                    item.setName(input.getText().toString());
-
-                    ChecklistManager.newInstance(NoteEditorActivity.this).create(item);
-
-                    if (mCurrentNote!=null)
-                        ChecklistManager.newInstance(NoteEditorActivity.this).getChecklistItemByNoteId(mCurrentNote.getId());
-                    else ChecklistManager.newInstance(NoteEditorActivity.this).getChecklistItemByNoteId((long) 0);
-
-                }
-            }
-        });
-        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        alertDialog.setNeutralButton("Next", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int i) {
-                if (input.getText()==null){dialog.dismiss();}
-                else {
-                    CheckItem item = new CheckItem();
-                    item.setName(input.getText().toString());
-                    ChecklistManager.newInstance(NoteEditorActivity.this).create(item);
-                    promptToAddItem();
-                }
-            }
-        });
-        alertDialog.show();
-    }
-
     private void openFragment(final Fragment fragment, String title){
         getSupportFragmentManager()
                 .beginTransaction()
@@ -147,7 +98,8 @@ public class NoteEditorActivity extends MainActivity {
     public void onClickListener(View v) {
         switch (v.getId()){
             case R.id.btn_add_checkItem:
-                promptToAddItem();
+                ChecklistEditorFragment fragment = (ChecklistEditorFragment) getSupportFragmentManager().findFragmentById(R.id.container);
+                fragment.promptToAddItem();
         }
     }
 }

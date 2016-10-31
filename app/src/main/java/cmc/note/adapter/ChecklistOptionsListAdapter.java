@@ -1,6 +1,7 @@
 package cmc.note.adapter;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,10 @@ public class ChecklistOptionsListAdapter extends RecyclerView.Adapter<ChecklistO
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.itemName.setText(mCheckItems.get(position).getName());
+        if (mCheckItems.get(position).getStatus()){
+            holder.itemName.setPaintFlags(holder.itemName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else
+            holder.itemName.setPaintFlags(0);
     }
 
     @Override
@@ -44,11 +49,12 @@ public class ChecklistOptionsListAdapter extends RecyclerView.Adapter<ChecklistO
         return mCheckItems.size();
     }
 
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView itemName;
         public ViewHolder(View itemView) {
             super(itemView);
-            itemName = (TextView)itemView.findViewById(R.id.text_view_note_title);
+            itemName = (TextView)itemView.findViewById(R.id.text_view_item_name);
     //            itemView.setOnClickListener(new View.OnClickListener() {
     //                @Override
     //                public void onClick(View view) {
@@ -71,10 +77,10 @@ public class ChecklistOptionsListAdapter extends RecyclerView.Adapter<ChecklistO
     //                    return true;
     //                }
     //            });
+
         }
     }
 
-    private static String getReadableModifiedDate(long date){
-        return new SimpleDateFormat("MMM dd, yyyy - h:mm a").format(new Date(date));
-    }
+
+
 }

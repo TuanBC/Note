@@ -1,22 +1,23 @@
 package cmc.note.activities;
 
-import android.app.Activity;
-import android.app.Dialog;
+import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.Menu;
 import android.view.View;
-import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.context.IconicsLayoutInflater;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
@@ -26,16 +27,19 @@ import com.mikepenz.materialdrawer.util.KeyboardUtil;
 
 import cmc.note.R;
 import cmc.note.data.DatabaseHelper;
+import cmc.note.data.NoteManager;
 import cmc.note.fragments.NoteListFragment;
+import cmc.note.models.Note;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LayoutInflaterCompat.setFactory(getLayoutInflater(), new IconicsLayoutInflater(getDelegate()));
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
         databaseHelper.getWritableDatabase();
@@ -55,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Now build the navigation drawer and pass the AccountHeader
-        com.mikepenz.materialdrawer.Drawer result = new DrawerBuilder()
+        new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(mToolbar)
                 .withActionBarDrawerToggle(true)
@@ -67,14 +71,14 @@ public class MainActivity extends AppCompatActivity {
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int i, IDrawerItem drawerItem) {
-                        if (drawerItem != null && drawerItem instanceof Nameable){
-                            String name = ((Nameable)drawerItem).getName().getText(MainActivity.this);
+                        if (drawerItem != null && drawerItem instanceof Nameable) {
+                            String name = ((Nameable) drawerItem).getName().getText(MainActivity.this);
                             mToolbar.setTitle(name);
                         }
 
-                        if (drawerItem != null){
-                            int selectedScren = drawerItem.getIdentifier();
-                            switch (selectedScren){
+                        if (drawerItem != null) {
+                            int selectedScren = (int) drawerItem.getIdentifier();
+                            switch (selectedScren) {
                                 case 1:
                                     //do nothing
                                     break;
@@ -110,6 +114,43 @@ public class MainActivity extends AppCompatActivity {
                 .build();
     }
 
+    @Override
+    public void onBackPressed() {
+        promptToExit();
+    }
+
+    private void promptToExit() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setMessage("Exit the program?");
+        alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                android.os.Process.killProcess(android.os.Process.myPid());
+                System.exit(0);
+            }
+        });
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alertDialog.show();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            Toast.makeText(this, "Searching by: "+ query, Toast.LENGTH_SHORT).show();
+
+        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            String uri = intent.getDataString();
+            Toast.makeText(this, "Suggestion: "+ uri, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private View.OnClickListener button_listener = new View.OnClickListener() {
         public void onClick(View v) {
             Intent editorIntent = new Intent(MainActivity.this, NoteEditorActivity.class);
@@ -120,13 +161,51 @@ public class MainActivity extends AppCompatActivity {
 
                     break;
                 case R.id.btn_add_checklist:
-                    editorIntent.putExtra("type", "checklist");
-                    startActivity(editorIntent);
-
+                    promptToAddChecklistNote();
                     break;
             }
         }
     };
+
+    private void promptToAddChecklistNote() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+
+        final EditText input = new EditText(this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+
+        alertDialog.setView(input); // uncomment this line
+        alertDialog.setTitle("Enter title of the checklist ");
+        alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String note_title = input.getText().toString();
+                if (note_title.equals("")){dialog.dismiss();}
+                else {
+                    Note note = new Note();
+                    note.setTitle(note_title);
+                    note.setType("checklist");
+                    note.setContent("");
+                    NoteManager.newInstance(MainActivity.this).create(note);
+                    Note temp_note = NoteManager.newInstance(MainActivity.this).getNoteByTitle(note_title);
+
+                    Intent intent = new Intent(MainActivity.this, NoteEditorActivity.class);
+                    intent.putExtra("checklist_id", temp_note.getId());
+                    intent.putExtra("type","checklist");
+                    startActivity(intent);
+                }
+            }
+        });
+        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alertDialog.show();
+    }
 
     private void openFragment(final Fragment fragment, String title){
         getSupportFragmentManager()
@@ -137,40 +216,4 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
         getSupportActionBar().setTitle(title);
     }
-
-    public void showNoticeDialog() {
-        // Create an instance of the dialog fragment and show it
-        DialogFragment dialog = new NoticeDialogFragment();
-        dialog.show(getSupportFragmentManager(), "NoticeDialogFragment");
-    }
-
-    public static class NoticeDialogFragment extends DialogFragment {
-
-        /* The activity that creates an instance of this dialog fragment must
-         * implement this interface in order to receive event callbacks.
-         * Each method passes the DialogFragment in case the host needs to query it. */
-        public interface NoticeDialogListener {
-            public void onDialogPositiveClick(DialogFragment dialog);
-            public void onDialogNegativeClick(DialogFragment dialog);
-        }
-
-        // Use this instance of the interface to deliver action events
-        NoticeDialogListener mListener;
-
-        // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            // Verify that the host activity implements the callback interface
-            try {
-                // Instantiate the NoticeDialogListener so we can send events to the host
-                mListener = (NoticeDialogListener) activity;
-            } catch (ClassCastException e) {
-                // The activity doesn't implement the interface, throw exception
-                throw new ClassCastException(activity.toString()
-                        + " must implement NoticeDialogListener");
-            }
-        }
-    }
-
 }

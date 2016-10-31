@@ -1,28 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
-    <CheckBox
-        android:id="@+id/item_cb"
-        android:layout_width="0dp"
-        android:layout_gravity="center_vertical"
-        android:layout_weight=".1"
-        android:layout_height="wrap_content" />
-    <EditText
-        android:id="@+id/item_et"
+    android:background="@color/material_drawer_accent"
+    android:layout_height="40sp"
+    android:layout_marginBottom="@dimen/dividerHeight">
+    <TextView
+        android:id="@+id/text_view_item_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:ems="10"
+        android:textSize="20sp"
         android:background="@null"
         android:layout_weight=".8">
-    </EditText>
-    <Button
-        android:id="@+id/btn_deleteItem"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_action_delete"
-        android:background="@drawable/ic_action_delete"
-        android:layout_weight=".15" />
+    </TextView>
+
 </LinearLayout>

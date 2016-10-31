@@ -20,7 +20,7 @@ public class LinedEditText extends EditText {
         rect = new Rect();
         paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
-        paint.setColor(Color.parseColor("#e5e500"));
+        paint.setColor(Color.parseColor("#000000"));
     }
 
     @Override

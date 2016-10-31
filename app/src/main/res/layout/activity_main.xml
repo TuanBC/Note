@@ -17,7 +17,6 @@
         android:id="@+id/container"
         android:tag="container"
         android:layout_below="@+id/toolbar"
-        android:layout_weight="1"
         android:padding="@dimen/margin_padding_xtiny"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

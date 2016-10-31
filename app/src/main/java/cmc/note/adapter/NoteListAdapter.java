@@ -1,10 +1,12 @@
 package cmc.note.adapter;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -38,6 +40,9 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHo
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.noteTitle.setText(mNotes.get(position).getTitle());
         holder.noteModifiedDate.setText(getReadableModifiedDate(mNotes.get(position).getDateModified()));
+        if (mNotes.get(position).getType().equals("checklist")){
+            holder.noteType.setImageResource(R.drawable.ic_check);
+        }
     }
 
     @Override
@@ -48,11 +53,13 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView noteTitle, noteModifiedDate;
+        public final ImageView noteType;
 
         public ViewHolder(View itemView) {
             super(itemView);
             noteTitle = (TextView)itemView.findViewById(R.id.text_view_note_title);
             noteModifiedDate = (TextView)itemView.findViewById(R.id.text_view_note_date);
+            noteType = (ImageView)itemView.findViewById(R.id.image_view_note_type);
 
 //            itemView.setOnClickListener(new View.OnClickListener() {
 //                @Override
@@ -80,6 +87,6 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHo
     }
 
     private static String getReadableModifiedDate(long date){
-        return new SimpleDateFormat("MMM dd, yyyy - h:mm a").format(new Date(date));
+        return new SimpleDateFormat("MMM dd, yyyy\nh:mm a").format(new Date(date));
     }
 }

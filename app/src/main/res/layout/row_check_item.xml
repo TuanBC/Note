@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="@dimen/margin_padding_tiny"
-    android:background="@color/material_drawer_accent">
+    android:background="@color/material_drawer_accent"
+    android:layout_height="40sp"
+    android:layout_marginBottom="@dimen/dividerHeight">
     <TextView
         android:id="@+id/text_view_item_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:ems="10"
-        android:textSize="@dimen/text_size_xxnormal"
+        android:textSize="20sp"
         android:background="@null"
         android:layout_weight=".8">
     </TextView>

@@ -181,15 +181,11 @@ public class ChecklistEditorFragment extends Fragment {
                 ChecklistManager.newInstance(getActivity()).create(item);
             }
 
-            new Thread(new Runnable() {
-                public void run(){
-                    List<CheckItem> mTempItems = mCurrentItems;
-                    mTempItems.addAll(mAddedItems);
-                    for (CheckItem item : mTempItems){
-                        ChecklistManager.newInstance(getActivity()).update(item);
-                    }
-                }
-            }).start();
+            List<CheckItem> mTempItems = mCurrentItems;
+            mTempItems.addAll(mAddedItems);
+            for (CheckItem item : mTempItems){
+                ChecklistManager.newInstance(getActivity()).update(item);
+            }
 
             mAddedItems.clear();
 
@@ -369,25 +365,9 @@ public class ChecklistEditorFragment extends Fragment {
     }
 
     public void refreshAddedItems() {
-        new Thread(new Runnable() {
-            public void run(){
-                List<CheckItem> mTempItems = mCurrentItems;
-                mTempItems.add(mAddedItems.get(mAddedItems.size()-1));
-                mAdapter = new ChecklistOptionsListAdapter(mTempItems, getActivity());
-            }
-        }).start();
-        mRecyclerView.setAdapter(mAdapter);
-    }
-
-    public void refresh(){
-        new Thread(new Runnable() {
-            public void run(){
-                List<CheckItem> mTempItems = mCurrentItems;
-
-                    mTempItems.addAll(mAddedItems);
-                mAdapter = new ChecklistOptionsListAdapter(mTempItems, getActivity());
-            }
-        }).start();
+        List<CheckItem> mTempItems = mCurrentItems;
+        mTempItems.add(mAddedItems.get(mAddedItems.size()-1));
+        mAdapter = new ChecklistOptionsListAdapter(mTempItems, getActivity());
         mRecyclerView.setAdapter(mAdapter);
     }
 

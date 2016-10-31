@@ -7,23 +7,24 @@
         android:orderInCategory="1"
         app:showAsAction="always"
         android:title="Add"
-        android:icon="@drawable/ic_action_add"
-        />
-
+        android:icon="@drawable/ic_action_add" />
     <item
         android:id="@+id/action_search"
         android:orderInCategory="2"
-        app:showAsAction="ifRoom"
+        app:showAsAction="ifRoom|collapseActionView"
         android:title="Search"
-        android:icon="@drawable/ic_action_search"/>
-    <item
-        android:id="@+id/action_exit"
-        android:orderInCategory="3"
-        app:showAsAction="never"
-        android:title="Exit"/>
+        android:icon="@drawable/ic_action_search"
+        android:actionLayout="@layout/search_layout"
+        app:actionViewClass="android.support.v7.widget.SearchView"/>
     <item
         android:id="@+id/action_sort"
-        android:orderInCategory="4"
+        android:orderInCategory="3"
         app:showAsAction="never"
         android:title="Sort"/>
+    <item
+        android:id="@+id/action_exit"
+        android:orderInCategory="4"
+        app:showAsAction="never"
+        android:title="Exit"/>
+
 </menu>

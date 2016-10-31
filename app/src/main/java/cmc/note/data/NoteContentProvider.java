@@ -39,16 +39,6 @@ public class NoteContentProvider extends android.content.ContentProvider {
         URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CHECK_ITEM, ITEMS);
         URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CHECK_ITEM + "/#", ITEM);
     }
-//
-//    private void checkColumns(String[] projection) {
-//        if (projection != null) {
-//            HashSet<String> request = new HashSet<>(Arrays.asList(projection));
-//            HashSet<String> note_available = new HashSet<>(Arrays.asList(Constants.NOTE_COLUMNS));
-//            if (!note_available.containsAll(request)) {
-//                throw new IllegalArgumentException("Unknown columns (note) in projection");
-//            }
-//        }
-//    }
 
     @Override
     public boolean onCreate() {
@@ -112,7 +102,6 @@ public class NoteContentProvider extends android.content.ContentProvider {
         return Uri.parse(BASE_PATH_NOTE + "/" + id);
     }
 
-
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int type = URI_MATCHER.match(uri);
@@ -151,7 +140,6 @@ public class NoteContentProvider extends android.content.ContentProvider {
         getContext().getContentResolver().notifyChange(uri, null);
         return affectedRows;
     }
-
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {

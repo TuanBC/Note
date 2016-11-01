@@ -162,6 +162,8 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.btn_add_checklist:
                     promptToAddChecklistNote();
+//                    editorIntent.putExtra("type", "checklist");
+//                    startActivity(editorIntent);
                     break;
             }
         }

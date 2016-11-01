@@ -95,14 +95,20 @@ public class NoteListFragment extends Fragment implements SwipeRefreshLayout.OnR
 
             @Override
             public void onLongItemClick(View view, int position) {
-                confirmDialog();
+                confirmDialog(position);
             }
         }));
     }
 
-    public void confirmDialog() {
+    public void confirmDialog(int position) {
+        Note selectedNote = mNotes.get(position);
+
+        Bundle args = new Bundle();
+        args.putLong("id", selectedNote.getId());
+
         DialogFragment newFragment = new ListDialogFragment();
-        newFragment.show(getFragmentManager(), "note options");
+        newFragment.setArguments(args);
+        newFragment.show(getFragmentManager(), "NOTE OPTIONS");
     }
 
     //ADD MENU

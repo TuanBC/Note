@@ -165,7 +165,7 @@ public class NoteLinedEditorFragment extends Fragment {
                 if (mCurrentNote != null){
                     promptForDelete();
                 }else {
-                    makeToast("Cannot delete note that has not been saved");
+                    getActivity().finish();
                 }
                 break;
         }

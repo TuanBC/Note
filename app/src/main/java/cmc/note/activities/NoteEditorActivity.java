@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import cmc.note.R;
 import cmc.note.data.ChecklistManager;
@@ -63,8 +64,21 @@ public class NoteEditorActivity extends MainActivity {
                     if (type.equals("note"))
                         openFragment(NoteLinedEditorFragment.newInstance(0), "Editor");
                     else if (type.equals("checklist")) {
-                        long checklist_id = args.getLong("checklist_id", 0);
-                        openFragment(ChecklistEditorFragment.newInstance(checklist_id), "Checklist");
+                        if (args.containsKey("checklist_id")) {
+                            long checklist_id = args.getLong("checklist_id", 0);
+                            openFragment(ChecklistEditorFragment.newInstance(checklist_id), "Checklist");
+                        } else {
+                            Note note = new Note();
+                            note.setTitle("");
+                            note.setType("checklist");
+                            note.setContent("");
+                            NoteManager.newInstance(this).create(note);
+
+                            Note temp_note = NoteManager.newInstance(this).getNoteByTitle("");
+                            openFragment(ChecklistEditorFragment.newInstance(temp_note.getId()), "Checklist");
+                        }
+//                        long checklist_id = args.getLong("checklist_id", 0);
+//                        openFragment(ChecklistEditorFragment.newInstance(checklist_id), "Checklist");
                     }
                 }
             }
@@ -73,12 +87,20 @@ public class NoteEditorActivity extends MainActivity {
 
     @Override
     public void onBackPressed() {
-        if (mCurrentNote==null) this.finish();
+        if (mCurrentNote==null) {
+            Note temp_note = NoteManager.newInstance(this).getLastNote();
+            if (temp_note.getTitle().equals("")) NoteManager.newInstance(this).delete(temp_note);
+            this.finish();
+            makeToast("null note");
+        }
+//        else if (mCurrentNote.getTitle().equals("")&&mCurrentNote.getContent().equals("")) this.finish();
         else {
             if (mCurrentNote.getType().equals("note")) {
+                makeToast("note");
                 NoteLinedEditorFragment fragment = (NoteLinedEditorFragment) getSupportFragmentManager().findFragmentById(R.id.container);
                 fragment.onBackClicked();
             } else if (mCurrentNote.getType().equals("checklist")) {
+                makeToast("checklist");
                 ChecklistEditorFragment fragment = (ChecklistEditorFragment) getSupportFragmentManager().findFragmentById(R.id.container);
                 fragment.onBackClicked();
             }
@@ -101,5 +123,9 @@ public class NoteEditorActivity extends MainActivity {
                 ChecklistEditorFragment fragment = (ChecklistEditorFragment) getSupportFragmentManager().findFragmentById(R.id.container);
                 fragment.promptToAddItem();
         }
+    }
+
+    private void makeToast(String s) {
+        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 }

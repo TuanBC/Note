@@ -127,6 +127,7 @@ public class NoteManager {
         if (cursor != null){
             cursor.moveToFirst();
             note = Note.getNotefromCursor(cursor);
+            cursor.close();
             return note;
         }
         return null;
@@ -142,11 +143,24 @@ public class NoteManager {
         if (cursor != null){
             cursor.moveToFirst();
             note = Note.getNotefromCursor(cursor);
+            cursor.close();
             return note;
         }
         return null;
     }
 
+    public Note getLastNote() {
+        Note note;
+        Cursor cursor = mContext.getContentResolver().query(NoteContentProvider.CONTENT_URI,
+                Constants.NOTE_COLUMNS, null, null, Constants.NOTE_COL_MODIFIED_TIME + " DESC ");
+        if (cursor != null){
+            cursor.moveToFirst();
+            note = Note.getNotefromCursor(cursor);
+            cursor.close();
+            return note;
+        }
+        return null;
+    }
     //CR(U)D
     public void update(Note note) {
         ContentValues values = new ContentValues();

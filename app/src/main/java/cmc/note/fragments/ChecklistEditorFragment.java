@@ -160,16 +160,14 @@ public class ChecklistEditorFragment extends Fragment {
         }));
     }
 
-
-
-
     private boolean saveNote(){
         int size = mAddedItems.size();
 
         String title = mTitleEditText.getText().toString();
         if (TextUtils.isEmpty(title)){
-//            mTitleEditText.setError("Title required");
-            mCurrentNote.setTitle(getReadableDateWithoutHour(System.currentTimeMillis()));
+            mTitleEditText.setError("Title required");
+//            mCurrentNote.setTitle(getReadableDateWithoutHour(System.currentTimeMillis()));
+            return false;
         }
 
 
@@ -271,6 +269,7 @@ public class ChecklistEditorFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mCurrentItems.clear();
+                NoteManager.newInstance(getActivity()).delete(mCurrentNote);
                 getActivity().finish();
             }
         });

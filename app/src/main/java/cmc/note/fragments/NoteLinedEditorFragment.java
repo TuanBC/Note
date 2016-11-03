@@ -37,6 +37,10 @@ public class NoteLinedEditorFragment extends Fragment {
     private TextView mTimeAgo;
     private TextView mModifiedTime;
 
+    private String mListOrder;
+
+    private final static String TAG = "NOTEEDITOR Fragment";
+
     public NoteLinedEditorFragment() {
         // Required empty public constructor
     }
@@ -60,6 +64,10 @@ public class NoteLinedEditorFragment extends Fragment {
         getCurrentNote();
     }
 
+    public void setListOrder(String s){
+        this.mListOrder=s;
+    }
+
     public static NoteLinedEditorFragment newInstance(long id){
         NoteLinedEditorFragment fragment = new NoteLinedEditorFragment();
 
@@ -67,7 +75,6 @@ public class NoteLinedEditorFragment extends Fragment {
             Bundle bundle = new Bundle();
             bundle.putLong("id", id);
             fragment.setArguments(bundle);
-            Log.i("NoteLinedEditorFragment", "done pushing id");
         }
 
         return fragment;
@@ -102,6 +109,7 @@ public class NoteLinedEditorFragment extends Fragment {
             NoteManager.newInstance(getActivity()).update(mCurrentNote);
 
             Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.putExtra("list_order", mListOrder);
             startActivity(intent);
         }else {
             Note note = new Note();
@@ -111,6 +119,7 @@ public class NoteLinedEditorFragment extends Fragment {
             NoteManager.newInstance(getActivity()).create(note);
 
             Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.putExtra("list_order", mListOrder);
             startActivity(intent);
         }
         return true;
@@ -182,7 +191,10 @@ public class NoteLinedEditorFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 NoteManager.newInstance(getActivity()).delete(mCurrentNote);
                 makeToast(titleOfNoteTobeDeleted + "deleted");
-                startActivity(new Intent(getActivity(), MainActivity.class));
+
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                intent.putExtra("list_order", mListOrder);
+                startActivity(intent);
             }
         });
         alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

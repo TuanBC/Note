@@ -96,11 +96,6 @@ public class ChecklistManager {
     }
 
     //CRU(D)
-    public void delete(CheckItem checkItem) {
-        clContext.getContentResolver().delete(
-                NoteContentProvider.CL_URI, Constants.CL_COL_ID + "=" + checkItem.getId(), null);
-    }
-
     public void deleteByNoteId(Long id){
         clContext.getContentResolver().delete(
                 NoteContentProvider.CL_URI, Constants.CL_COL_NOTEID + "=" + id, null);

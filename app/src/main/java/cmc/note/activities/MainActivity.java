@@ -10,8 +10,10 @@ import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -26,6 +28,7 @@ import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.mikepenz.materialdrawer.util.KeyboardUtil;
 
 import cmc.note.R;
+import cmc.note.adapter.NoteListAdapter;
 import cmc.note.data.DatabaseHelper;
 import cmc.note.data.NoteManager;
 import cmc.note.fragments.NoteListFragment;
@@ -33,6 +36,9 @@ import cmc.note.models.Note;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
+    private String mListOrder;
+    private final String TAG = "MAIN ACTIVITY";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,20 +50,40 @@ public class MainActivity extends AppCompatActivity {
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
         databaseHelper.getWritableDatabase();
 
+        //ADD COMMAND TO GET mListOrder
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
         if (mToolbar != null)
            setSupportActionBar(mToolbar);
 
         if (savedInstanceState == null){
+            Bundle mArgs = getIntent().getExtras();
+            if (mArgs!=null) {
+                mListOrder = mArgs.getString("list_order");
+                Log.i (TAG, "get order = "+mListOrder);
+            }
             NoteListFragment fragment = new NoteListFragment();
+            fragment.setListOrder(mListOrder);
             openFragment(fragment, "Note List");
         }
 
         findViewById(R.id.btn_add_note).setOnClickListener(button_listener);
         findViewById(R.id.btn_add_checklist).setOnClickListener(button_listener);
         findViewById(R.id.btn_add_photo).setOnClickListener(button_listener);
+        Button sort_button = (Button)findViewById(R.id.btn_set_order);
+        sort_button.setOnClickListener(button_listener);
+        if (mListOrder==null) sort_button.setText("Sorted by modified time");
 
-
+//        switch (mListOrder){
+//            case "abc_asc":
+//                sort_button.setText("Sorted by alphabetical");
+//                break;
+//            case "created_desc":
+//                sort_button.setText("Sorted by created time");
+//                break;
+//            default:
+//                sort_button.setText("Sorted by modified time");
+//                break;
+//        }
         //Now build the navigation drawer and pass the AccountHeader
         new DrawerBuilder()
                 .withActivity(this)
@@ -66,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName(R.string.title_home).withIcon(FontAwesome.Icon.faw_home).withIdentifier(1),
                         new PrimaryDrawerItem().withName(R.string.title_setting).withIcon(FontAwesome.Icon.faw_list).withIdentifier(2)
-
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -138,36 +163,67 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            Toast.makeText(this, "Searching by: "+ query, Toast.LENGTH_SHORT).show();
-
-        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-            String uri = intent.getDataString();
-            Toast.makeText(this, "Suggestion: "+ uri, Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private View.OnClickListener button_listener = new View.OnClickListener() {
         public void onClick(View v) {
-            Intent editorIntent = new Intent(MainActivity.this, NoteEditorActivity.class);
             switch (v.getId()){
                 case R.id.btn_add_note:
-                    editorIntent.putExtra("type", "note");
-                    startActivity(editorIntent);
+                    Intent editorIntent = new Intent(MainActivity.this, NoteEditorActivity.class);
+//                    Bundle args = new Bundle();
+//                    args.putString("type", "note");
+//                    args.putString("list_order", mListOrder);
+//
+//                    editorIntent.putExtra("bundle", args);
 
+                    editorIntent.putExtra("type", "note");
+                    editorIntent.putExtra("list_order", mListOrder);
+                    startActivity(editorIntent);
                     break;
                 case R.id.btn_add_checklist:
                     promptToAddChecklistNote();
 //                    editorIntent.putExtra("type", "checklist");
 //                    startActivity(editorIntent);
                     break;
+                case R.id.btn_set_order:
+                    promptToSort();
+                    break;
             }
         }
     };
+
+    private void promptToSort() {
+        final Button sort_button = (Button)findViewById(R.id.btn_set_order);
+        String[] array_sort = {"Alphabetical", "Created time", "Modified time"};
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+        alertDialog.setTitle(R.string.sort)
+                .setItems(array_sort, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which){
+                            case 0:
+                                mListOrder = "abc_asc";
+                                sort_button.setText("Sorted by alphabetical");
+                                break;
+                            case 1:
+                                mListOrder = "created_desc";
+                                sort_button.setText("Sorted by created time");
+                                break;
+                            case 2:
+                                mListOrder = "modified_desc";
+                                sort_button.setText("Sorted by modified time");
+                                break;
+                        }
+
+//                        Intent mIntent = getIntent();
+//                        mIntent.putExtra("list_order", mListOrder);
+//                        mIntent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+//                        finish();
+//                        startActivity(mIntent);
+                        NoteListFragment fragment = new NoteListFragment();
+                        fragment.setListOrder(mListOrder);
+                        openFragment(fragment, "Note List");
+                    }
+                });
+        alertDialog.show();
+    }
 
     private void promptToAddChecklistNote() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
@@ -194,8 +250,15 @@ public class MainActivity extends AppCompatActivity {
                     Note temp_note = NoteManager.newInstance(MainActivity.this).getNoteByTitle(note_title);
 
                     Intent intent = new Intent(MainActivity.this, NoteEditorActivity.class);
+
+//                    Bundle args = new Bundle();
+//                    args.putLong("id", temp_note.getId());
+//                    args.putString("type","checklist");
+//                    args.putString("list_order", mListOrder);
+
                     intent.putExtra("checklist_id", temp_note.getId());
                     intent.putExtra("type","checklist");
+                    intent.putExtra("list_order", mListOrder);
                     startActivity(intent);
                 }
             }

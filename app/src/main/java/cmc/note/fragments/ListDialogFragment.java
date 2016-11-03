@@ -27,7 +27,7 @@ public class ListDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Bundle mArgs = getArguments();
+        final Bundle mArgs = getArguments();
         final long note_id = mArgs.getLong("id");
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Choose an Option")
@@ -37,7 +37,8 @@ public class ListDialogFragment extends DialogFragment {
                         switch (which){
                             case 0:
                                 Intent editorIntent = new Intent(getActivity(), NoteEditorActivity.class);
-                                editorIntent.putExtra("id", note_id);
+                                editorIntent.putExtra("bundle", mArgs);
+
                                 startActivity(editorIntent);
                                 break;
                             case 1:

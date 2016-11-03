@@ -53,6 +53,12 @@ public class ChecklistEditorFragment extends Fragment {
     private List<CheckItem> mCurrentItems = new ArrayList<>();
     private List<CheckItem> mAddedItems = new ArrayList<>();
 
+    private String mListOrder;
+
+    public void setListOrder(String s){
+        this.mListOrder=s;
+    }
+
     public ChecklistEditorFragment() {
         // Required empty public constructor
     }
@@ -188,6 +194,7 @@ public class ChecklistEditorFragment extends Fragment {
             mAddedItems.clear();
 
             Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.putExtra("list_order", mListOrder);
             startActivity(intent);
         }else {
             if (size==0){
@@ -245,7 +252,9 @@ public class ChecklistEditorFragment extends Fragment {
                 ChecklistManager.newInstance(getActivity()).deleteByNoteId(mCurrentNote.getId());
 
                 makeToast(titleOfNoteTobeDeleted + "deleted");
-                startActivity(new Intent(getActivity(), MainActivity.class));
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                intent.putExtra("list_order", mListOrder);
+                startActivity(intent);
             }
         });
         alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

@@ -24,10 +24,18 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHo
 
     private List<Note> mNotes;
     private Context mContext;
+    private String mListOrder;
+
 
     public NoteListAdapter(List<Note> notes, Context context){
         mNotes = notes;
         mContext = context;
+    }
+
+    public NoteListAdapter(List<Note> notes, Context context, String order){
+        mNotes = notes;
+        mContext = context;
+        mListOrder = order;
     }
 
     @Override

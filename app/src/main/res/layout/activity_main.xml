@@ -13,10 +13,17 @@
         android:id="@+id/toolbar"
         layout="@layout/toolbar"/>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_set_order"
+        android:layout_below="@+id/toolbar"
+        android:background="@color/material_drawer_background" />
+
     <FrameLayout
         android:id="@+id/container"
         android:tag="container"
-        android:layout_below="@+id/toolbar"
+        android:layout_below="@+id/btn_set_order"
         android:padding="@dimen/margin_padding_xtiny"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -29,13 +29,14 @@ import cmc.note.models.Note;
 public class NoteEditorActivity extends MainActivity {
     private Toolbar mToolbar;
     private Note mCurrentNote;
+    private String mListOrder;
+
+    private final String TAG = "NOTEEDITOR ACTIVITY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_editor);
-
-
 
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
         if (mToolbar != null)
@@ -43,30 +44,39 @@ public class NoteEditorActivity extends MainActivity {
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);    //backbutton
 
         if (savedInstanceState == null){
-            Bundle args = getIntent().getExtras();
-            if (args != null) {
-                if (args.containsKey("id")) {
-                    long id = args.getLong("id", 0);
+            Bundle mArgs = getIntent().getExtras();
+            if (mArgs != null) {
+                this.mListOrder=mArgs.getString("list_order");
+                Log.i(TAG, "get order " + mListOrder);
+                if (mArgs.containsKey("id")) { //if note existed
+                    long id = mArgs.getLong("id", 0);
 
                     if (id > 0) { //OPEN SPECIFIC FRAGMENT WITH GIVEN ID
                         mCurrentNote = NoteManager.newInstance(this).getNote(id);
 
                         if (mCurrentNote.getType().equals("checklist")) {
-                            openFragment(ChecklistEditorFragment.newInstance(id), "Checklist");
+                            ChecklistEditorFragment f = ChecklistEditorFragment.newInstance(id);
+                            f.setListOrder(mListOrder);
+                            openFragment(f, "Checklist");
                         } else if (mCurrentNote.getType().equals("note")) {
-                            openFragment(NoteLinedEditorFragment.newInstance(id), "Editor");
+                            NoteLinedEditorFragment f = NoteLinedEditorFragment.newInstance(id);
+                            f.setListOrder(mListOrder);
+                            openFragment(f, "Editor");
                         }
                     }
-                } else if (args.containsKey("type")) {
-                    String type = args.getString("type", "");
+                } else if (mArgs.containsKey("type")) {
+                    String type = mArgs.getString("type");
 
-
-                    if (type.equals("note"))
-                        openFragment(NoteLinedEditorFragment.newInstance(0), "Editor");
-                    else if (type.equals("checklist")) {
-                        if (args.containsKey("checklist_id")) {
-                            long checklist_id = args.getLong("checklist_id", 0);
-                            openFragment(ChecklistEditorFragment.newInstance(checklist_id), "Checklist");
+                    if (type.equals("note")) {
+                        ChecklistEditorFragment f = ChecklistEditorFragment.newInstance(0);
+                        f.setListOrder(mListOrder);
+                        openFragment(f, "Editor");
+                    } else if (type.equals("checklist")) {
+                        if (mArgs.containsKey("checklist_id")) {
+                            long checklist_id = mArgs.getLong("checklist_id", 0);
+                            ChecklistEditorFragment f = ChecklistEditorFragment.newInstance(checklist_id);
+                            f.setListOrder(mListOrder);
+                            openFragment(f, "Checklist");
                         } else {
                             Note note = new Note();
                             note.setTitle("");
@@ -75,7 +85,10 @@ public class NoteEditorActivity extends MainActivity {
                             NoteManager.newInstance(this).create(note);
 
                             Note temp_note = NoteManager.newInstance(this).getNoteByTitle("");
-                            openFragment(ChecklistEditorFragment.newInstance(temp_note.getId()), "Checklist");
+
+                            ChecklistEditorFragment f = ChecklistEditorFragment.newInstance(temp_note.getId());
+                            f.setListOrder(mListOrder);
+                            openFragment(f, "Checklist");
                         }
 //                        long checklist_id = args.getLong("checklist_id", 0);
 //                        openFragment(ChecklistEditorFragment.newInstance(checklist_id), "Checklist");

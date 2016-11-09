@@ -25,22 +25,22 @@ public class LinedEditText extends EditText {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        int height = getHeight();
-        int lineHeight = getLineHeight();
-        int count = height / lineHeight;
-
-        // For long text with scrolling
-        if (getLineCount() > count) {
-            count = getLineCount();
-        }
-
-        // Draw first line
-        int baseline = getLineBounds(0, rect);
-        for (int i = 0; i < count; i++) {
-            canvas.drawLine(rect.left, baseline + 1, rect.right, baseline + 1, paint);
-            // Draw next line
-            baseline += getLineHeight();
-        }
+//        int height = getHeight();
+//        int lineHeight = getLineHeight();
+//        int count = height / lineHeight;
+//
+//        // For long text with scrolling
+//        if (getLineCount() > count) {
+//            count = getLineCount();
+//        }
+//
+//        // Draw first line
+//        int baseline = getLineBounds(0, rect);
+//        for (int i = 0; i < count; i++) {
+//            canvas.drawLine(rect.left, baseline + 1, rect.right, baseline + 1, paint);
+//            // Draw next line
+//            baseline += getLineHeight();
+//        }
         super.onDraw(canvas);
     }
 }

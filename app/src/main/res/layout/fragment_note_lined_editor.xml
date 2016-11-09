@@ -32,14 +32,24 @@
         android:id="@+id/edit_text_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
         android:layout_marginBottom="@dimen/margin_padding_small"
         android:layout_marginLeft="@dimen/margin_padding_tiny"
         android:layout_marginTop="@dimen/margin_padding_tiny"
         android:hint="@string/enter_title"
-        android:padding="@dimen/margin_padding_tiny"
-        android:singleLine="true"
-        android:textColor="#000000"/>
+        android:textColor="#000000"
+        android:textSize="@dimen/text_size_large"
+        android:paddingBottom="@dimen/margin_padding_normal"
+        android:layout_gravity="top|left"
+        android:background="@android:color/transparent"
+        android:paddingLeft="@dimen/margin_padding_tiny"
+        android:paddingRight="@dimen/margin_padding_tiny"
+        android:paddingTop="@dimen/margin_padding_tiny" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:background="?android:attr/colorPrimaryDark"
+        android:layout_height="1dp"></LinearLayout>
 
     <cmc.note.models.LinedEditText
         android:id="@+id/edit_text_note"
@@ -52,6 +62,7 @@
         android:inputType="textMultiLine"
         android:padding="@dimen/margin_padding_small"
         android:scrollbars="vertical"
-        android:textSize="@dimen/text_size_xnormal"/>
+        android:textSize="@dimen/text_size_xnormal"
+        android:background="@android:color/transparent" />
 
 </LinearLayout>

@@ -1,7 +1,6 @@
 package cmc.note.adapter;
 
 import android.content.Context;
-import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,43 +13,39 @@ import java.util.Date;
 import java.util.List;
 
 import cmc.note.R;
-import cmc.note.models.Note;
+import cmc.note.models.Category;
 
 /**
-* Created by tuanb on 10-Oct-16.
-*/
+ * Created by tuanb on 07-Nov-16.
+ */
 
-public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHolder>{
-    private List<Note> mNotes;
+public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapter.ViewHolder>{
+    private List<Category> mCategories;
     private Context mContext;
 //    private String mListOrder;
 
-    public NoteListAdapter(List<Note> notes, Context context){
-        mNotes = notes;
+    public CategoryListAdapter(List<Category> categories, Context context){
+        mCategories = categories;
         mContext = context;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View rowView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_note_list, parent, false);
-        return new ViewHolder(rowView);
+    public CategoryListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View rowView = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_category, parent, false);
+        return new CategoryListAdapter.ViewHolder(rowView);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.noteTitle.setText(mNotes.get(position).getTitle());
-        holder.noteModifiedDate.setText(getReadableModifiedDate(mNotes.get(position).getDateModified()));
-        if (mNotes.get(position).getType().equals("checklist")){
-            holder.noteType.setImageResource(R.drawable.ic_check);
-        }
+    public void onBindViewHolder(final CategoryListAdapter.ViewHolder holder, int position) {
+        holder.noteTitle.setText(mCategories.get(position).getTitle());
+        holder.noteModifiedDate.setText(getReadableModifiedDate(mCategories.get(position).getDateModified()));
     }
 
     @Override
     public int getItemCount() {
-        return mNotes.size();
+        return mCategories.size();
     }
-
-
+    
     class ViewHolder extends RecyclerView.ViewHolder {
         final TextView noteTitle, noteModifiedDate;
         final ImageView noteType;

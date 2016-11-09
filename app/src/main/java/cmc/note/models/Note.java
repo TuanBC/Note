@@ -66,12 +66,12 @@ public class Note {
 
     public static Note getNotefromCursor(Cursor cursor){
         Note note = new Note();
-        note.setId(cursor.getLong(cursor.getColumnIndex(Constants.NOTE_COL_ID)));
-        note.setTitle(cursor.getString(cursor.getColumnIndex(Constants.NOTE_COL_TITLE)));
-        note.setContent(cursor.getString(cursor.getColumnIndex(Constants.NOTE_COL_CONTENT)));
-        note.setType(cursor.getString(cursor.getColumnIndex(Constants.NOTE_COL_TYPE)));
-        note.setDateCreated(cursor.getLong(cursor.getColumnIndex(Constants.NOTE_COL_CREATED_TIME)));
-        note.setDateModified(cursor.getLong(cursor.getColumnIndex(Constants.NOTE_COL_MODIFIED_TIME)));
+        note.setId(cursor.getLong(cursor.getColumnIndex(Constants.COL_ID)));
+        note.setTitle(cursor.getString(cursor.getColumnIndex(Constants.COL_TITLE)));
+        note.setContent(cursor.getString(cursor.getColumnIndex(Constants.COL_CONTENT)));
+        note.setType(cursor.getString(cursor.getColumnIndex(Constants.COL_TYPE)));
+        note.setDateCreated(cursor.getLong(cursor.getColumnIndex(Constants.COL_CREATED_TIME)));
+        note.setDateModified(cursor.getLong(cursor.getColumnIndex(Constants.COL_MODIFIED_TIME)));
 
         return note;
     }

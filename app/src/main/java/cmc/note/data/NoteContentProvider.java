@@ -1,6 +1,5 @@
 package cmc.note.data;
 
-import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -9,9 +8,6 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
-
-import java.util.Arrays;
-import java.util.HashSet;
 
 import cmc.note.ultilities.Constants;
 
@@ -23,13 +19,18 @@ public class NoteContentProvider extends android.content.ContentProvider {
 
     private static final String BASE_PATH_NOTE = "notes";
     private static final String BASE_PATH_CHECK_ITEM = "check_items";
+    private static final String BASE_PATH_CATEGORY = "categories";
+
     private static final String AUTHORITY = "cmc.note.data.provider";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_NOTE);
     public static final Uri CL_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_CHECK_ITEM);
+    public static final Uri CATEGORY_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_CATEGORY);
     private static final int NOTE = 100;
     private static final int NOTES = 101;
     private static final int ITEM = 200;
     private static final int ITEMS = 201;
+    private static final int CATEGORY = 300;
+    private static final int CATEGORIES = 301;
 
     private static final UriMatcher URI_MATCHER;
     static {
@@ -38,6 +39,8 @@ public class NoteContentProvider extends android.content.ContentProvider {
         URI_MATCHER.addURI(AUTHORITY, BASE_PATH_NOTE + "/#", NOTE);
         URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CHECK_ITEM, ITEMS);
         URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CHECK_ITEM + "/#", ITEM);
+        URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CATEGORY, CATEGORIES);
+        URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CATEGORY + "/#", CATEGORY);
     }
 
     @Override
@@ -69,6 +72,14 @@ public class NoteContentProvider extends android.content.ContentProvider {
                 queryBuilder.setTables(Constants.CL_TABLE);
                 Log.i("LOG","case_ITEM");
                 break;
+            case CATEGORIES:
+                queryBuilder.setTables(Constants.CATEGORIES_TABLE);
+                Log.i("LOG","case_CATEGORIES");
+                break;
+            case CATEGORY:
+                queryBuilder.setTables(Constants.CATEGORIES_TABLE);
+                Log.i("LOG","case_CATEGORY");
+                break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -95,6 +106,9 @@ public class NoteContentProvider extends android.content.ContentProvider {
             case ITEMS:
                 id = db.insert(Constants.CL_TABLE, null, values);
                 break;
+            case CATEGORIES:
+                id = db.insert(Constants.CATEGORIES_TABLE, null, values);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown URI at notecontent: " + uri);
         }
@@ -112,26 +126,36 @@ public class NoteContentProvider extends android.content.ContentProvider {
             case NOTES:
                 affectedRows = db.delete(Constants.NOTES_TABLE, selection, selectionArgs);
                 break;
-
             case NOTE:
                 id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
-                    affectedRows = db.delete(Constants.NOTES_TABLE, Constants.NOTE_COL_ID + " = " + id, null);
+                    affectedRows = db.delete(Constants.NOTES_TABLE, Constants.COL_ID + " = " + id, null);
                 } else {
-                    affectedRows = db.delete(Constants.NOTES_TABLE, Constants.NOTE_COL_ID + " = " + id + " and " + selection, selectionArgs);
+                    affectedRows = db.delete(Constants.NOTES_TABLE, Constants.COL_ID + " = " + id + " and " + selection, selectionArgs);
                 }
                 break;
 
             case ITEMS:
                 affectedRows = db.delete(Constants.CL_TABLE, selection, selectionArgs);
                 break;
-
             case ITEM:
                 id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
-                    affectedRows = db.delete(Constants.CL_TABLE, Constants.CL_COL_ID + " = " + id, null);
+                    affectedRows = db.delete(Constants.CL_TABLE, Constants.COL_ID + " = " + id, null);
                 } else {
-                    affectedRows = db.delete(Constants.CL_TABLE, Constants.CL_COL_ID + " = " + id + " and " + selection, selectionArgs);
+                    affectedRows = db.delete(Constants.CL_TABLE, Constants.COL_ID + " = " + id + " and " + selection, selectionArgs);
+                }
+                break;
+
+            case CATEGORIES:
+                affectedRows = db.delete(Constants.CATEGORIES_TABLE, selection, selectionArgs);
+                break;
+            case CATEGORY:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)) {
+                    affectedRows = db.delete(Constants.CATEGORIES_TABLE, Constants.COL_ID + " = " + id, null);
+                } else {
+                    affectedRows = db.delete(Constants.CATEGORIES_TABLE, Constants.COL_ID + " = " + id + " and " + selection, selectionArgs);
                 }
                 break;
             default:
@@ -151,26 +175,36 @@ public class NoteContentProvider extends android.content.ContentProvider {
             case NOTES:
                 affectedRows = db.update(Constants.NOTES_TABLE, values, selection, selectionArgs);
                 break;
-
             case NOTE:
                 id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
-                    affectedRows = db.update(Constants.NOTES_TABLE, values, Constants.NOTE_COL_ID + "=" + id, null);
+                    affectedRows = db.update(Constants.NOTES_TABLE, values, Constants.COL_ID + "=" + id, null);
                 } else {
-                    affectedRows = db.update(Constants.NOTES_TABLE, values, Constants.NOTE_COL_ID + "=" + id + " and " + selection, selectionArgs);
+                    affectedRows = db.update(Constants.NOTES_TABLE, values, Constants.COL_ID + "=" + id + " and " + selection, selectionArgs);
                 }
                 break;
 
             case ITEMS:
                 affectedRows = db.update(Constants.CL_TABLE, values, selection, selectionArgs);
                 break;
-
             case ITEM:
                 id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
-                    affectedRows = db.update(Constants.CL_TABLE, values, Constants.CL_COL_ID + "=" + id, null);
+                    affectedRows = db.update(Constants.CL_TABLE, values, Constants.COL_ID + "=" + id, null);
                 } else {
-                    affectedRows = db.update(Constants.CL_TABLE, values, Constants.CL_COL_ID + "=" + id + " and " + selection, selectionArgs);
+                    affectedRows = db.update(Constants.CL_TABLE, values, Constants.COL_ID + "=" + id + " and " + selection, selectionArgs);
+                }
+                break;
+
+            case CATEGORIES:
+                affectedRows = db.update(Constants.CATEGORIES_TABLE, values, selection, selectionArgs);
+                break;
+            case CATEGORY:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)) {
+                    affectedRows = db.update(Constants.CATEGORIES_TABLE, values, Constants.COL_ID + "=" + id, null);
+                } else {
+                    affectedRows = db.update(Constants.CATEGORIES_TABLE, values, Constants.COL_ID + "=" + id + " and " + selection, selectionArgs);
                 }
                 break;
             default:

@@ -4,9 +4,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -54,6 +57,24 @@ public class NoteLinedEditorFragment extends Fragment {
         mContentEditText = (EditText)mRootView.findViewById(R.id.edit_text_note);
         mTimeAgo = (TextView)mRootView.findViewById(R.id.time_ago);
         mModifiedTime = (TextView)mRootView.findViewById(R.id.modified_time);
+
+        //
+        mRootView.setFocusableInTouchMode(true);
+        mRootView.requestFocus();
+
+//        mRootView.setOnKeyListener( new View.OnKeyListener()
+//        {
+//            @Override
+//            public boolean onKey( View v, int keyCode, KeyEvent event )
+//            {
+//                if( keyCode != KeyEvent.FLAG_SOFT_KEYBOARD )
+//                {
+//                    getActivity().finish();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        } );
         return mRootView;
     }
 
@@ -93,14 +114,9 @@ public class NoteLinedEditorFragment extends Fragment {
 
     private boolean saveNote(){
         String content = mContentEditText.getText().toString();
-        if (TextUtils.isEmpty(content)){
-            mContentEditText.setError("Content is required");
-            return false;
-        }
-
         String title = mTitleEditText.getText().toString();         //DEFAULT TITLE = CONTENT
         if (TextUtils.isEmpty(title)){
-            title=content;
+            title="Untitled Note";
         }
 
         if (mCurrentNote != null){
@@ -211,22 +227,26 @@ public class NoteLinedEditorFragment extends Fragment {
     }
 
     public void promptForDiscard(){
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle("Discard?");
-        alertDialog.setMessage("Are you sure you want to go back? All changes will be discarded");
-        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                getActivity().finish();
-            }
-        });
-        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        alertDialog.show();
+        if (mRootView.hasFocus())
+            getActivity().finish();
+        else {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+            alertDialog.setTitle("Discard?");
+            alertDialog.setMessage("Are you sure you want to go back? All changes will be discarded");
+            alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    getActivity().finish();
+                }
+            });
+            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            alertDialog.show();
+        }
     }
 
     private void makeToast(String s) {

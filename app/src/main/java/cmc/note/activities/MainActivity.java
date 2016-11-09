@@ -71,27 +71,31 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_add_photo).setOnClickListener(button_listener);
         Button sort_button = (Button)findViewById(R.id.btn_set_order);
         sort_button.setOnClickListener(button_listener);
-        if (mListOrder==null) sort_button.setText("Sorted by modified time");
+        if (mListOrder==null) {
+            Log.i(TAG," didn't receive list order");
+            mListOrder = "modified_desc";
+        }
 
-//        switch (mListOrder){
-//            case "abc_asc":
-//                sort_button.setText("Sorted by alphabetical");
-//                break;
-//            case "created_desc":
-//                sort_button.setText("Sorted by created time");
-//                break;
-//            default:
-//                sort_button.setText("Sorted by modified time");
-//                break;
-//        }
+        switch (mListOrder){
+            case "abc_asc":
+                sort_button.setText("Sorted by alphabetical");
+                break;
+            case "created_desc":
+                sort_button.setText("Sorted by created time");
+                break;
+            default:
+                sort_button.setText("Sorted by modified time");
+                break;
+        }
+
         //Now build the navigation drawer and pass the AccountHeader
         new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(mToolbar)
                 .withActionBarDrawerToggle(true)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName(R.string.title_home).withIcon(FontAwesome.Icon.faw_home).withIdentifier(1),
-                        new PrimaryDrawerItem().withName(R.string.title_setting).withIcon(FontAwesome.Icon.faw_list).withIdentifier(2)
+                        new PrimaryDrawerItem().withName(R.string.title_home).withIcon(FontAwesome.Icon.faw_sticky_note).withIdentifier(1),
+                        new PrimaryDrawerItem().withName(R.string.title_setting).withIcon(FontAwesome.Icon.faw_cog).withIdentifier(2)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -105,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                             int selectedScren = (int) drawerItem.getIdentifier();
                             switch (selectedScren) {
                                 case 1:
-                                    //do nothing
+                                    //nothing
                                     break;
                                 case 2:
                                     //go to settings screen
@@ -280,5 +284,18 @@ public class MainActivity extends AppCompatActivity {
                 .addToBackStack(null)
                 .commit();
         getSupportActionBar().setTitle(title);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            Toast.makeText(this, "Searching by: "+ query, Toast.LENGTH_SHORT).show();
+
+        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            String uri = intent.getDataString();
+            Toast.makeText(this, "Suggestion: "+ uri, Toast.LENGTH_SHORT).show();
+        }
     }
 }

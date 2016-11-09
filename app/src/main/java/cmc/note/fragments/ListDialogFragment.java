@@ -29,6 +29,7 @@ public class ListDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final Bundle mArgs = getArguments();
         final long note_id = mArgs.getLong("id");
+        final String list_order=mArgs.getString("list_order");
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Choose an Option")
                 .setItems(list_options, new DialogInterface.OnClickListener() {
@@ -37,7 +38,7 @@ public class ListDialogFragment extends DialogFragment {
                         switch (which){
                             case 0:
                                 Intent editorIntent = new Intent(getActivity(), NoteEditorActivity.class);
-                                editorIntent.putExtra("bundle", mArgs);
+                                editorIntent.putExtra("list_order",list_order);
 
                                 startActivity(editorIntent);
                                 break;
@@ -45,14 +46,17 @@ public class ListDialogFragment extends DialogFragment {
                                 Note temp_note = NoteManager.newInstance(getActivity()).getNote(note_id);
                                 NoteManager.newInstance(getActivity()).delete(temp_note);
                                 Activity a = getActivity();
+                                Intent intent = a.getIntent();
+                                intent.putExtra("list_order", list_order);
                                 a.finish();
                                 a.overridePendingTransition(0, 0);
-                                a.startActivity(a.getIntent());
+                                a.startActivity(intent);
                                 a.overridePendingTransition(0, 0);
                                 break;
                         }
                     }
                 });
+        Log.i("LOG", "dialog created");
         return builder.create();
     }
 }

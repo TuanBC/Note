@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -109,11 +110,9 @@ public class NoteEditorActivity extends MainActivity {
 //        else if (mCurrentNote.getTitle().equals("")&&mCurrentNote.getContent().equals("")) this.finish();
         else {
             if (mCurrentNote.getType().equals("note")) {
-                makeToast("note");
                 NoteLinedEditorFragment fragment = (NoteLinedEditorFragment) getSupportFragmentManager().findFragmentById(R.id.container);
                 fragment.onBackClicked();
             } else if (mCurrentNote.getType().equals("checklist")) {
-                makeToast("checklist");
                 ChecklistEditorFragment fragment = (ChecklistEditorFragment) getSupportFragmentManager().findFragmentById(R.id.container);
                 fragment.onBackClicked();
             }

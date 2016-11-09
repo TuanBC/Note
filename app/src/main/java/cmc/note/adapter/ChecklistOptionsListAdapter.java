@@ -50,34 +50,11 @@ public class ChecklistOptionsListAdapter extends RecyclerView.Adapter<ChecklistO
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final TextView itemName;
-        public ViewHolder(View itemView) {
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final TextView itemName;
+        ViewHolder(View itemView) {
             super(itemView);
             itemName = (TextView)itemView.findViewById(R.id.text_view_item_name);
-    //            itemView.setOnClickListener(new View.OnClickListener() {
-    //                @Override
-    //                public void onClick(View view) {
-    //                    Log.d("log holder", getAdapterPosition() + "position clicked.");
-    //
-    //                    long position = getAdapterPosition();
-    //                    Intent editorIntent = new Intent(mContext, NoteEditorActivity.class);
-    //                    editorIntent.putExtra("id", position);
-    //
-    //
-    //                    mContext.startActivity(editorIntent);
-    //                }
-    //            });
-    //
-    //            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-    //
-    //                @Override
-    //                public boolean onLongClick(View view) {
-    //                    Log.d("holder", "Element " + getAdapterPosition() + " long clicked.");
-    //                    return true;
-    //                }
-    //            });
-
         }
     }
 

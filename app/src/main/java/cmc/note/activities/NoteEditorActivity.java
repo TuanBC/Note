@@ -1,26 +1,17 @@
 package cmc.note.activities;
 
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.preference.DialogPreference;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import cmc.note.R;
-import cmc.note.data.ChecklistManager;
 import cmc.note.data.NoteManager;
 import cmc.note.fragments.ChecklistEditorFragment;
 import cmc.note.fragments.NoteLinedEditorFragment;
-import cmc.note.models.CheckItem;
 import cmc.note.models.Note;
 
 /**
@@ -69,7 +60,7 @@ public class NoteEditorActivity extends MainActivity {
                     String type = mArgs.getString("type");
 
                     if (type.equals("note")) {
-                        ChecklistEditorFragment f = ChecklistEditorFragment.newInstance(0);
+                        NoteLinedEditorFragment f = NoteLinedEditorFragment.newInstance(0);
                         f.setListOrder(mListOrder);
                         openFragment(f, "Editor");
                     } else if (type.equals("checklist")) {

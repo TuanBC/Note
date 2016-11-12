@@ -11,7 +11,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,7 +27,6 @@ import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.mikepenz.materialdrawer.util.KeyboardUtil;
 
 import cmc.note.R;
-import cmc.note.adapter.NoteListAdapter;
 import cmc.note.data.DatabaseHelper;
 import cmc.note.data.NoteManager;
 import cmc.note.fragments.NoteListFragment;
@@ -47,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this);
         databaseHelper.getWritableDatabase();
 
         //ADD COMMAND TO GET mListOrder
@@ -113,6 +111,10 @@ public class MainActivity extends AppCompatActivity {
                                     break;
                                 case 2:
                                     //go to settings screen
+                                    Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+//                                    intent.putExtra("type", "note");
+//                                    intent.putExtra("list_order", mListOrder);
+                                    startActivity(intent);
                                     Toast.makeText(MainActivity.this, "Settings Clicked", Toast.LENGTH_SHORT).show();
                                     break;
                             }
@@ -172,14 +174,9 @@ public class MainActivity extends AppCompatActivity {
             switch (v.getId()){
                 case R.id.btn_add_note:
                     Intent editorIntent = new Intent(MainActivity.this, NoteEditorActivity.class);
-//                    Bundle args = new Bundle();
-//                    args.putString("type", "note");
-//                    args.putString("list_order", mListOrder);
-//
-//                    editorIntent.putExtra("bundle", args);
-
                     editorIntent.putExtra("type", "note");
                     editorIntent.putExtra("list_order", mListOrder);
+                    Log.i(TAG, "add note clicked");
                     startActivity(editorIntent);
                     break;
                 case R.id.btn_add_checklist:

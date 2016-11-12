@@ -45,7 +45,7 @@ public class NoteContentProvider extends android.content.ContentProvider {
 
     @Override
     public boolean onCreate() {
-        dbHelper = new DatabaseHelper(getContext());
+        dbHelper = DatabaseHelper.getInstance(getContext());
         return false;
     }
 

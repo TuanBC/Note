@@ -14,6 +14,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "simple_note_app.db";
     private static final int DATABASE_VERSION = 1;
+    private static DatabaseHelper mInstance = null;
+
 
     private static final String CREATE_TABLE_NOTE = "create table "
             + Constants.NOTES_TABLE
@@ -44,14 +46,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + Constants.COL_MODIFIED_TIME + " integer not null "
             + ")";
 
-    public DatabaseHelper(Context context) {
+    private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
+
+    public static DatabaseHelper getInstance(Context ctx) {
+
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (mInstance == null) {
+            mInstance = new DatabaseHelper(ctx.getApplicationContext());
+        }
+        return mInstance;
+    }
+
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_NOTE);
         db.execSQL(CREATE_TABLE_CHECKLIST);
+        db.execSQL(CREATE_TABLE_CATEGORY);
     }
 
     @Override

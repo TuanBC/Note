@@ -48,7 +48,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:background="?android:attr/colorPrimaryDark"
+        android:background="@color/divider"
         android:layout_height="1dp"></LinearLayout>
 
     <cmc.note.models.LinedEditText

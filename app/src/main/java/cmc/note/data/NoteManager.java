@@ -49,12 +49,17 @@ public class NoteManager {
 
     //C(R)UD
     public List<Note> getAllNotesWithKey(String text) {
-        List<Note> temp = this.getAllNotesWithKeyTitle(text);
-        temp.addAll(this.getAllNotesWithKeyContent(text));
-        return temp;
+        List<Note> temp_1 = this.getAllNotesWithKeyTitle(text);
+        List<Note> temp_2 = this.getAllNotesWithKeyContent(text);
+        for (Note note: temp_2){
+            if (!temp_1.contains(note)){
+                temp_1.add(note);
+            } else break;
+        }
+        return temp_1;
     }
 
-    public List<Note> getAllNotesWithKeyTitle(String text) {
+    private List<Note> getAllNotesWithKeyTitle(String text) {
         List<Note> notes = new ArrayList<>();
         if (text.equals("")) return notes;
         Cursor cursor = mContext.getContentResolver().query(NoteContentProvider.CONTENT_URI,
@@ -73,7 +78,7 @@ public class NoteManager {
         return notes;
     }
 
-    public List<Note> getAllNotesWithKeyContent(String text) {
+    private List<Note> getAllNotesWithKeyContent(String text) {
         List<Note> notes = new ArrayList<>();
         if (text.equals("")) return notes;
         Cursor cursor = mContext.getContentResolver().query(NoteContentProvider.CONTENT_URI,

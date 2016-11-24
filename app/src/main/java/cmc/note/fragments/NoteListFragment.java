@@ -52,7 +52,6 @@ public class NoteListFragment extends Fragment implements SwipeRefreshLayout.OnR
         // Required empty public constructor
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -74,7 +73,15 @@ public class NoteListFragment extends Fragment implements SwipeRefreshLayout.OnR
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mNotes = NoteManager.newInstance(getActivity()).getAllNotesSortedBy(mListOrder);
+        Bundle args = getArguments();
+        if (args!=null) {
+            if (args.containsKey("cat_id")) {
+                setListOrder(args.getString("list_order"));
+                mNotes = NoteManager.newInstance(getActivity()).getNotesByCategoryId(args.getLong("cat_id"));
+            }
+        } else {
+            mNotes = NoteManager.newInstance(getActivity()).getAllNotesSortedBy(mListOrder);
+        }
         mAdapter = new NoteListAdapter(mNotes, getActivity());
         mRecyclerView.setAdapter(mAdapter);
 

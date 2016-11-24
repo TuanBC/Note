@@ -15,6 +15,7 @@ public class Note {
     private long dateCreated;
     private long dateModified;
     private String type;
+    private Long category_id = 1L;
 
     public String getContent() {
         return content;
@@ -64,12 +65,21 @@ public class Note {
         this.title = title;
     }
 
+    public Long getCategoryId() {
+        return category_id;
+    }
+
+    public void setCategoryId(Long cat_id) {
+        this.category_id = cat_id;
+    }
+
     public static Note getNotefromCursor(Cursor cursor){
         Note note = new Note();
         note.setId(cursor.getLong(cursor.getColumnIndex(Constants.COL_ID)));
         note.setTitle(cursor.getString(cursor.getColumnIndex(Constants.COL_TITLE)));
         note.setContent(cursor.getString(cursor.getColumnIndex(Constants.COL_CONTENT)));
         note.setType(cursor.getString(cursor.getColumnIndex(Constants.COL_TYPE)));
+        note.setCategoryId(cursor.getLong(cursor.getColumnIndex(Constants.COL_CATID)));
         note.setDateCreated(cursor.getLong(cursor.getColumnIndex(Constants.COL_CREATED_TIME)));
         note.setDateModified(cursor.getLong(cursor.getColumnIndex(Constants.COL_MODIFIED_TIME)));
 

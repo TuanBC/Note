@@ -1,8 +1,11 @@
 package cmc.note.fragments;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -13,15 +16,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import cmc.note.R;
 import cmc.note.activities.MainActivity;
+import cmc.note.activities.NoteEditorActivity;
 import cmc.note.data.NoteManager;
 import cmc.note.models.Note;
 
@@ -36,8 +43,9 @@ public class NoteLinedEditorFragment extends Fragment {
     private Note mCurrentNote;
     private TextView mTimeAgo;
     private TextView mModifiedTime;
-
     private String mListOrder;
+
+    private Calendar date = null;
 
     private final static String TAG = "NOTEEDITOR Fragment";
 
@@ -55,7 +63,6 @@ public class NoteLinedEditorFragment extends Fragment {
         mTimeAgo = (TextView)mRootView.findViewById(R.id.time_ago);
         mModifiedTime = (TextView)mRootView.findViewById(R.id.modified_time);
 
-        //
         mRootView.setFocusableInTouchMode(true);
         mRootView.requestFocus();
 
@@ -72,6 +79,10 @@ public class NoteLinedEditorFragment extends Fragment {
 //                return false;
 //            }
 //        } );
+
+        mRootView.findViewById(R.id.btn_category).setOnClickListener(button_listener);
+        mRootView.findViewById(R.id.btn_reminder).setOnClickListener(button_listener);
+
         return mRootView;
     }
 
@@ -114,6 +125,11 @@ public class NoteLinedEditorFragment extends Fragment {
         String title = mTitleEditText.getText().toString();         //DEFAULT TITLE = CONTENT
         if (TextUtils.isEmpty(title)){
             title="Untitled Note";
+        }
+
+        if (date!=null){
+            MainActivity a = (MainActivity) getActivity();
+            a.scheduleNotification(a.getNotification(title), date.getTimeInMillis()-System.currentTimeMillis());
         }
 
         if (mCurrentNote != null){
@@ -163,7 +179,7 @@ public class NoteLinedEditorFragment extends Fragment {
     }
 
     private static String getReadableDate(long date){
-        return new SimpleDateFormat("MMM dd, yyyy - h:mm a").format(new Date(date));
+        return new SimpleDateFormat("MMM dd, yyyy").format(new Date(date));
     }
 
     @Override
@@ -246,7 +262,68 @@ public class NoteLinedEditorFragment extends Fragment {
         }
     }
 
+    private View.OnClickListener button_listener = new View.OnClickListener() {
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.btn_reminder:
+
+                    //ADD SOME NOTICE TO USER THAT REMINDER SET
+
+                    if (date!=null) {
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+                        alertDialog.setTitle("Reminder");
+                        alertDialog.setMessage("What do you want to do?");
+                        alertDialog.setPositiveButton("Change", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                createDateTimePicker();
+                            }
+                        });
+                        alertDialog.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                date=null;
+                            }
+                        });
+                        alertDialog.show();
+                    } else createDateTimePicker();
+
+//                    TimePickerFragment newFragment = new TimePickerFragment();
+//
+//                    Bundle args = new Bundle();
+//                    if (mCurrentNote.getId()>0)
+//                        args.putString("note_title", mCurrentNote.getTitle());
+//                    else
+//                    newFragment.setArguments(args);
+//                    newFragment.show(getActivity().getFragmentManager(),"TimePicker");
+                    break;
+                case R.id.btn_category:
+                        //OPEN A DIALOG WITH CATEGORY LIST
+                    break;
+            }
+        }
+    };
+
     private void makeToast(String s) {
         Toast.makeText(getActivity(), s, Toast.LENGTH_SHORT).show();
+    }
+
+    private void createDateTimePicker(){
+        final Calendar currentDate = Calendar.getInstance();
+        date = Calendar.getInstance();
+        new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                date.set(year, monthOfYear, dayOfMonth);
+                new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        date.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        date.set(Calendar.MINUTE, minute);
+                        Log.v(TAG, "The choosen one " + date.getTime());
+                    }
+                }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
+            }
+        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DATE)).show();
     }
 }

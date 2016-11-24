@@ -49,20 +49,50 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:background="@color/divider"
-        android:layout_height="1dp"></LinearLayout>
+        android:layout_height="1dp"
+        android:id="@+id/divider"></LinearLayout>
 
-    <cmc.note.models.LinedEditText
-        android:id="@+id/edit_text_note"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:capitalize="sentences"
-        android:fadingEdge="vertical"
-        android:gravity="top"
-        android:hint="@string/enter_content"
-        android:inputType="textMultiLine"
-        android:padding="@dimen/margin_padding_small"
-        android:scrollbars="vertical"
-        android:textSize="@dimen/text_size_xnormal"
-        android:background="@android:color/transparent" />
+        android:layout_height="match_parent">
+
+        <cmc.note.models.LinedEditText
+            android:id="@+id/edit_text_note"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:capitalize="sentences"
+            android:fadingEdge="vertical"
+            android:gravity="top"
+            android:hint="@string/enter_content"
+            android:inputType="textMultiLine"
+            android:padding="@dimen/margin_padding_small"
+            android:scrollbars="vertical"
+            android:textSize="@dimen/text_size_xnormal"
+            android:background="@android:color/transparent"
+            android:layout_above="@+id/buttons" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttons"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="false">
+
+            <Button
+                android:text="Category"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_category"
+                android:layout_weight="1" />
+
+            <Button
+                android:text="Reminder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_reminder"
+                android:layout_weight="1" />
+        </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

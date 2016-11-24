@@ -42,7 +42,6 @@ public class NoteEditorActivity extends MainActivity {
                 Log.i(TAG, "get order " + mListOrder);
                 if (mArgs.containsKey("id")) { //if note existed
                     long id = mArgs.getLong("id", 0);
-
                     if (id > 0) { //OPEN SPECIFIC FRAGMENT WITH GIVEN ID
                         mCurrentNote = NoteManager.newInstance(this).getNote(id);
 
@@ -110,7 +109,7 @@ public class NoteEditorActivity extends MainActivity {
         }
     }
 
-    private void openFragment(final Fragment fragment, String title){
+    public void openFragment(final Fragment fragment, String title){
         getSupportFragmentManager()
                 .beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

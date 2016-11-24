@@ -2,6 +2,8 @@ package cmc.note.models;
 
 import android.database.Cursor;
 
+import cmc.note.activities.MainActivity;
+import cmc.note.data.CategoryManager;
 import cmc.note.ultilities.Constants;
 
 /**
@@ -11,9 +13,7 @@ import cmc.note.ultilities.Constants;
 public class Category {
     private Long id;
     private String title;
-    private long dateCreated;
-    private long dateModified;
-
+    private Long note_count;
 
     public Long getId() {
         return id;
@@ -31,20 +31,12 @@ public class Category {
         this.title = title;
     }
 
-    public long getDateModified() {
-        return dateModified;
+    public Long getNoteCount() {
+        return note_count;
     }
 
-    public void setDateModified(long dateModified) {
-        this.dateModified = dateModified;
-    }
-
-    public long getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(long dateCreated) {
-        this.dateCreated = dateCreated;
+    public void setNoteCount(Long note_count) {
+        this.note_count = note_count;
     }
 
     public static Category getCategoryfromCursor(Cursor cursor){

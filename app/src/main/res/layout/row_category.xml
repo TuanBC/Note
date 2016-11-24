@@ -10,16 +10,15 @@
     <TextView
         android:id="@+id/text_view_category_title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="left|center_vertical"
-        android:textAppearance="@android:style/TextAppearance.Material.Medium"
-        android:textAlignment="viewStart" />
+        android:textSize="@dimen/text_size_xnormal" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/text_view_notes"
+        android:id="@+id/text_view_note_count"
         android:layout_weight=".65"
-        android:textAppearance="@android:style/TextAppearance.Material.Small" />
+        android:textSize="@dimen/text_size_normal"/>
 
 </LinearLayout>

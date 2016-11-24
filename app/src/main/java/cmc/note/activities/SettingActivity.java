@@ -1,5 +1,6 @@
 package cmc.note.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.net.Uri;
@@ -55,7 +56,6 @@ public class SettingActivity extends PreferenceActivity implements GoogleApiClie
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
-        Log.i(TAG, "path ==== " + Environment.getDataDirectory().toString());
     }
 
 
@@ -352,4 +352,9 @@ public class SettingActivity extends PreferenceActivity implements GoogleApiClie
         }
     }
 
+    @Override
+    public void onBackPressed() {
+//        this.getActionBar().setTitle("SETTING DONE");
+        super.onBackPressed();
+    }
 }

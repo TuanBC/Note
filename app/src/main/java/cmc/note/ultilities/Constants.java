@@ -13,12 +13,14 @@ public class Constants {
     public static final String COL_CREATED_TIME = "created_time";
     public static final String COL_MODIFIED_TIME = "modified_time";
     public static final String COL_TYPE = "type";
+    public static final String COL_CATID = "category_id";
 
     public static final String[] NOTE_COLUMNS = {
             Constants.COL_ID,
             Constants.COL_TITLE,
             Constants.COL_CONTENT,
             Constants.COL_TYPE,
+            Constants.COL_CATID,
             Constants.COL_CREATED_TIME,
             Constants.COL_MODIFIED_TIME
     };
@@ -39,8 +41,6 @@ public class Constants {
 
     public static final String[] CATEGORY_COLUMNS = {
             Constants.COL_ID,
-            Constants.COL_TITLE,
-            Constants.COL_CREATED_TIME,
-            Constants.COL_MODIFIED_TIME
+            Constants.COL_TITLE
     };
 }

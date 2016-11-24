@@ -11,8 +11,9 @@
         android:layout_gravity="center_vertical"
         android:ems="10"
         android:textSize="20sp"
-        android:background="@null"
-        android:layout_weight=".8">
+        android:layout_weight=".8"
+        android:paddingLeft="@dimen/margin_padding_tiny"
+        android:paddingRight="@dimen/margin_padding_tiny">
     </TextView>
 
 </LinearLayout>

@@ -19,7 +19,6 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
 
-        findPreference("sync_create").setOnPreferenceClickListener(this);
         findPreference("sync_open").setOnPreferenceClickListener(this);
         findPreference("sync_save").setOnPreferenceClickListener(this);
     }
@@ -27,11 +26,6 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
     @Override
     public boolean onPreferenceClick(Preference preference) {
         switch (preference.getKey()) {
-            case ("sync_create"): {
-                SettingActivity activity = (SettingActivity) getActivity();
-                activity.onClickCreateFile();
-                break;
-            }
             case ("sync_open"): {
                 SettingActivity activity = (SettingActivity) getActivity();
                 activity.onClickOpenFile();

@@ -47,7 +47,6 @@
 
         <activity
             android:name=".activities.SettingActivity"
-            android:label="Setting"
             android:parentActivityName=".activities.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -73,6 +72,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info"/>
         </receiver>
-
+        <receiver android:name=".notification.NotificationPublisher" />
     </application>
 </manifest>

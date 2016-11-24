@@ -6,10 +6,6 @@
         android:title="Sync Options"
         android:key="pref_key_storage_settings">
         <Preference
-            android:key="sync_create"
-            android:title="Create file on Drive"
-            android:onClick="onClickCreateFile"/>
-        <Preference
             android:key="sync_open"
             android:title="Open file on Drive"
             android:onClick="onClick"/>

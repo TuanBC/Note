@@ -1,11 +1,19 @@
 package cmc.note.activities;
 
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.LayoutInflaterCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -29,14 +37,17 @@ import com.mikepenz.materialdrawer.util.KeyboardUtil;
 import cmc.note.R;
 import cmc.note.data.DatabaseHelper;
 import cmc.note.data.NoteManager;
+import cmc.note.fragments.CategoryListFragment;
 import cmc.note.fragments.NoteListFragment;
 import cmc.note.models.Note;
+import cmc.note.notification.NotificationPublisher;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private String mListOrder;
     private final String TAG = "MAIN ACTIVITY";
-
+    private boolean isCategoryFragment;
+    private Drawer result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +70,9 @@ public class MainActivity extends AppCompatActivity {
                 mListOrder = mArgs.getString("list_order");
                 Log.i (TAG, "get order = "+mListOrder);
             }
-            NoteListFragment fragment = new NoteListFragment();
-            fragment.setListOrder(mListOrder);
-            openFragment(fragment, "Note List");
+//            NoteListFragment fragment = new NoteListFragment();
+//            fragment.setListOrder(mListOrder);
+//            openFragment(fragment, "Note List");
         }
 
         findViewById(R.id.btn_add_note).setOnClickListener(button_listener);
@@ -87,13 +98,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //Now build the navigation drawer and pass the AccountHeader
-        new DrawerBuilder()
+        result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(mToolbar)
                 .withActionBarDrawerToggle(true)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName(R.string.title_home).withIcon(FontAwesome.Icon.faw_sticky_note).withIdentifier(1),
-                        new PrimaryDrawerItem().withName(R.string.title_setting).withIcon(FontAwesome.Icon.faw_cog).withIdentifier(2)
+                        new PrimaryDrawerItem().withName(R.string.title_category).withIcon(FontAwesome.Icon.faw_book).withIdentifier(2),
+                        new PrimaryDrawerItem().withName(R.string.title_setting).withIcon(FontAwesome.Icon.faw_cog).withIdentifier(3).withSelectable(false)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -107,13 +119,24 @@ public class MainActivity extends AppCompatActivity {
                             int selectedScren = (int) drawerItem.getIdentifier();
                             switch (selectedScren) {
                                 case 1:
-                                    //nothing
+                                    setCategoryFragment(false);
+                                    NoteListFragment fragment = new NoteListFragment();
+                                    fragment.setListOrder(mListOrder);
+                                    openFragment(fragment, "Note List");
                                     break;
                                 case 2:
+                                    setCategoryFragment(true);
+                                    CategoryListFragment fragment_1 = new CategoryListFragment();
+//                                    fragment_1.setListOrder(mListOrder);
+                                    openFragment(fragment_1, "Category List");
+                                    break;
+                                case 3:
                                     //go to settings screen
                                     Intent intent = new Intent(MainActivity.this, SettingActivity.class);
-//                                    intent.putExtra("type", "note");
+                                    String action_bar_title = getSupportActionBar().getTitle().toString();
+                                    intent.putExtra("title", action_bar_title);
 //                                    intent.putExtra("list_order", mListOrder);
+
                                     startActivity(intent);
                                     Toast.makeText(MainActivity.this, "Settings Clicked", Toast.LENGTH_SHORT).show();
                                     break;
@@ -129,17 +152,14 @@ public class MainActivity extends AppCompatActivity {
                     public void onDrawerOpened(View view) {
                         KeyboardUtil.hideKeyboard(MainActivity.this);
                     }
-
                     @Override
                     public void onDrawerClosed(View view) {
-
                     }
-
                     @Override
                     public void onDrawerSlide(View view, float v) {
-
                     }
                 })
+//                .withSelectedItem(-1)
                 .withFireOnInitialOnClick(true)
                 .withSavedInstance(savedInstanceState)
                 .build();
@@ -147,7 +167,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        promptToExit();
+        if (!isCategoryFragment()) promptToExit();
+        else if (getCurrentFragment() instanceof CategoryListFragment){
+            setCategoryFragment(false);
+            getSupportActionBar().setTitle("Note List");
+            result.setSelection(1, false);
+            super.onBackPressed();
+        } else if (getCurrentFragment() instanceof NoteListFragment){
+            getSupportActionBar().setTitle("Category List");
+            result.setSelection(2, false);
+            super.onBackPressed();
+        }
     }
 
     private void promptToExit() {
@@ -273,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void openFragment(final Fragment fragment, String title){
+    public void openFragment(final Fragment fragment, String title){
         getSupportFragmentManager()
                 .beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -294,5 +324,45 @@ public class MainActivity extends AppCompatActivity {
             String uri = intent.getDataString();
             Toast.makeText(this, "Suggestion: "+ uri, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public boolean isCategoryFragment() {
+        return isCategoryFragment;
+    }
+
+    public void setCategoryFragment(boolean categoryFragment) {
+        isCategoryFragment = categoryFragment;
+    }
+
+    private Fragment getCurrentFragment() {
+        FragmentManager fragmentManager = this.getSupportFragmentManager();
+        int stackCount = fragmentManager.getBackStackEntryCount();
+        if( fragmentManager.getFragments() != null ) return fragmentManager.getFragments().get( stackCount > 0 ? stackCount-1 : stackCount );
+        else return null;
+    }
+
+    //********************************************
+    //FIX TO DISPLAY CORRECT FRAGMENT NAME
+    //****************************************
+
+
+    public void scheduleNotification(Notification notification, long delay) {
+        Intent notificationIntent = new Intent(this, NotificationPublisher.class);
+        notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, 1);
+        notificationIntent.putExtra(NotificationPublisher.NOTIFICATION, notification);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        long futureInMillis = SystemClock.elapsedRealtime() + delay;
+        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent);
+    }
+
+    public Notification getNotification(String content) {
+        Notification.Builder builder = new Notification.Builder(this)
+                .setContentTitle("Scheduled Notification")
+                .setContentText(content)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setSmallIcon(R.mipmap.ic_launcher);
+        return builder.build();
     }
 }

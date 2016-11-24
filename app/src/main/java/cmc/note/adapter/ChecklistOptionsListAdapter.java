@@ -1,6 +1,7 @@
 package cmc.note.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,10 +37,13 @@ public class ChecklistOptionsListAdapter extends RecyclerView.Adapter<ChecklistO
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.itemName.setText(mCheckItems.get(position).getName());
-        if (mCheckItems.get(position).getStatus()){
+        if (mCheckItems.get(position).getStatus()) {
+            holder.itemName.setTextColor(Color.GRAY);
             holder.itemName.setPaintFlags(holder.itemName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-        } else
+        } else{
             holder.itemName.setPaintFlags(0);
+            holder.itemName.setTextColor(Color.BLACK);
+        }
     }
 
     @Override

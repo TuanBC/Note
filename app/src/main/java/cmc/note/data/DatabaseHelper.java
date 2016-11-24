@@ -24,6 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + Constants.COL_TITLE + " text not null, "
             + Constants.COL_CONTENT + " text, "
             + Constants.COL_TYPE + " text not null, "
+            + Constants.COL_CATID + " integer not null, "
             + Constants.COL_CREATED_TIME + " integer not null, "
             + Constants.COL_MODIFIED_TIME + " integer not null "
             + ")";
@@ -41,10 +42,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + Constants.CATEGORIES_TABLE
             + "("
             + Constants.COL_ID + " integer primary key autoincrement, "
-            + Constants.COL_TITLE + " text not null, "
-            + Constants.COL_CREATED_TIME + " integer not null, "
-            + Constants.COL_MODIFIED_TIME + " integer not null "
+            + Constants.COL_TITLE + " text not null "
             + ")";
+
+    private static final String INSERT_FIRST_CATEGORY = "insert into "
+            + Constants.CATEGORIES_TABLE
+            + " values (1, 'First notebook') ";
 
     private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -67,6 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_NOTE);
         db.execSQL(CREATE_TABLE_CHECKLIST);
         db.execSQL(CREATE_TABLE_CATEGORY);
+        db.execSQL(INSERT_FIRST_CATEGORY);
     }
 
     @Override

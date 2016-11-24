@@ -22,9 +22,10 @@ public class NoteContentProvider extends android.content.ContentProvider {
     private static final String BASE_PATH_CATEGORY = "categories";
 
     private static final String AUTHORITY = "cmc.note.data.provider";
-    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_NOTE);
+    public static final Uri NOTE_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_NOTE);
     public static final Uri CL_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_CHECK_ITEM);
     public static final Uri CATEGORY_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_CATEGORY);
+
     private static final int NOTE = 100;
     private static final int NOTES = 101;
     private static final int ITEM = 200;

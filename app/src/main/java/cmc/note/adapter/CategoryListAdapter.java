@@ -37,8 +37,10 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
 
     @Override
     public void onBindViewHolder(final CategoryListAdapter.ViewHolder holder, int position) {
-        holder.noteTitle.setText(mCategories.get(position).getTitle());
-        holder.noteModifiedDate.setText(getReadableModifiedDate(mCategories.get(position).getDateModified()));
+        holder.categoryTitle.setText(mCategories.get(position).getTitle());
+        if (mCategories.get(position).getNoteCount() == 1)
+            holder.noteCount.setText(mCategories.get(position).getNoteCount().toString()+" note");
+        else holder.noteCount.setText(mCategories.get(position).getNoteCount().toString()+" notes");
     }
 
     @Override
@@ -47,18 +49,16 @@ public class CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapte
     }
     
     class ViewHolder extends RecyclerView.ViewHolder {
-        final TextView noteTitle, noteModifiedDate;
-        final ImageView noteType;
+        final TextView categoryTitle, noteCount;
 
         ViewHolder(View itemView) {
             super(itemView);
-            noteTitle = (TextView)itemView.findViewById(R.id.text_view_note_title);
-            noteModifiedDate = (TextView)itemView.findViewById(R.id.text_view_note_date);
-            noteType = (ImageView)itemView.findViewById(R.id.image_view_note_type);
+            categoryTitle = (TextView)itemView.findViewById(R.id.text_view_category_title);
+            noteCount = (TextView)itemView.findViewById(R.id.text_view_note_count);
         }
     }
 
     private static String getReadableModifiedDate(long date){
-        return new SimpleDateFormat("MMM dd, yyyy\nh:mm a").format(new Date(date));
+        return new SimpleDateFormat("MMM dd, yyyy").format(new Date(date));
     }
 }

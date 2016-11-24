@@ -3,6 +3,7 @@
     <string name="enter_title">Title</string>
     <string name="enter_content">What is on your mind?</string>
     <string name="title_home">All Notes</string>
+    <string name="title_category">Notebooks</string>
     <string name="title_setting">Setting</string>
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>

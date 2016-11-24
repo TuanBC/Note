@@ -6,9 +6,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
+import cmc.note.R;
 import cmc.note.activities.NoteEditorActivity;
 import cmc.note.data.NoteManager;
 import cmc.note.models.Note;
@@ -33,6 +35,7 @@ public class ListDialogFragment extends DialogFragment {
                         switch (which){
                             case 0:
                                 Intent editorIntent = new Intent(getActivity(), NoteEditorActivity.class);
+                                editorIntent.putExtra("id", note_id);
                                 editorIntent.putExtra("list_order",list_order);
 
                                 startActivity(editorIntent);
@@ -51,7 +54,6 @@ public class ListDialogFragment extends DialogFragment {
                         }
                     }
                 });
-        Log.i("LOG", "dialog created");
         return builder.create();
     }
 }

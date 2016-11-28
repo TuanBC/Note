@@ -20,11 +20,13 @@ public class NoteContentProvider extends android.content.ContentProvider {
     private static final String BASE_PATH_NOTE = "notes";
     private static final String BASE_PATH_CHECK_ITEM = "check_items";
     private static final String BASE_PATH_CATEGORY = "categories";
+    private static final String BASE_PATH_ATTACHMENT = "attachments";
 
     private static final String AUTHORITY = "cmc.note.data.provider";
     public static final Uri NOTE_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_NOTE);
     public static final Uri CL_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_CHECK_ITEM);
     public static final Uri CATEGORY_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_CATEGORY);
+    public static final Uri ATTACH_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH_ATTACHMENT);
 
     private static final int NOTE = 100;
     private static final int NOTES = 101;
@@ -32,6 +34,8 @@ public class NoteContentProvider extends android.content.ContentProvider {
     private static final int ITEMS = 201;
     private static final int CATEGORY = 300;
     private static final int CATEGORIES = 301;
+    private static final int ATTACHMENT = 400;
+    private static final int ATTACHMENTS = 401;
 
     private static final UriMatcher URI_MATCHER;
     static {
@@ -42,6 +46,8 @@ public class NoteContentProvider extends android.content.ContentProvider {
         URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CHECK_ITEM + "/#", ITEM);
         URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CATEGORY, CATEGORIES);
         URI_MATCHER.addURI(AUTHORITY, BASE_PATH_CATEGORY + "/#", CATEGORY);
+        URI_MATCHER.addURI(AUTHORITY, BASE_PATH_ATTACHMENT, ATTACHMENTS);
+        URI_MATCHER.addURI(AUTHORITY, BASE_PATH_ATTACHMENT + "/#", ATTACHMENT);
     }
 
     @Override
@@ -81,6 +87,14 @@ public class NoteContentProvider extends android.content.ContentProvider {
                 queryBuilder.setTables(Constants.CATEGORIES_TABLE);
                 Log.i("LOG","case_CATEGORY");
                 break;
+            case ATTACHMENTS:
+                queryBuilder.setTables(Constants.ATTACHMENTS_TABLE);
+                Log.i("LOG","case_ATTACHMENTS");
+                break;
+            case ATTACHMENT:
+                queryBuilder.setTables(Constants.ATTACHMENTS_TABLE);
+                Log.i("LOG","case_ATTACHMENT");
+                break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -100,21 +114,29 @@ public class NoteContentProvider extends android.content.ContentProvider {
         int type = URI_MATCHER.match(uri);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         Long id;
+        Uri uri_temp;
         switch (type){
             case NOTES:
                 id = db.insert(Constants.NOTES_TABLE, null, values);
+                uri_temp = Uri.parse(BASE_PATH_NOTE + "/" + id);
                 break;
             case ITEMS:
                 id = db.insert(Constants.CL_TABLE, null, values);
+                uri_temp = Uri.parse(BASE_PATH_CHECK_ITEM + "/" + id);
                 break;
             case CATEGORIES:
                 id = db.insert(Constants.CATEGORIES_TABLE, null, values);
+                uri_temp = Uri.parse(BASE_PATH_CATEGORY + "/" + id);
+                break;
+            case ATTACHMENTS:
+                id = db.insert(Constants.ATTACHMENTS_TABLE, null, values);
+                uri_temp = Uri.parse(BASE_PATH_ATTACHMENT + "/" + id);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI at notecontent: " + uri);
         }
         getContext().getContentResolver().notifyChange(uri, null);
-        return Uri.parse(BASE_PATH_NOTE + "/" + id);
+        return uri_temp;
     }
 
     @Override
@@ -159,6 +181,19 @@ public class NoteContentProvider extends android.content.ContentProvider {
                     affectedRows = db.delete(Constants.CATEGORIES_TABLE, Constants.COL_ID + " = " + id + " and " + selection, selectionArgs);
                 }
                 break;
+
+            case ATTACHMENTS:
+                affectedRows = db.delete(Constants.ATTACHMENTS_TABLE, selection, selectionArgs);
+                break;
+            case ATTACHMENT:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)) {
+                    affectedRows = db.delete(Constants.ATTACHMENTS_TABLE, Constants.COL_ID + " = " + id, null);
+                } else {
+                    affectedRows = db.delete(Constants.ATTACHMENTS_TABLE, Constants.COL_ID + " = " + id + " and " + selection, selectionArgs);
+                }
+                break;
+
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
@@ -206,6 +241,18 @@ public class NoteContentProvider extends android.content.ContentProvider {
                     affectedRows = db.update(Constants.CATEGORIES_TABLE, values, Constants.COL_ID + "=" + id, null);
                 } else {
                     affectedRows = db.update(Constants.CATEGORIES_TABLE, values, Constants.COL_ID + "=" + id + " and " + selection, selectionArgs);
+                }
+                break;
+
+            case ATTACHMENTS:
+                affectedRows = db.update(Constants.ATTACHMENTS_TABLE, values, selection, selectionArgs);
+                break;
+            case ATTACHMENT:
+                id = uri.getLastPathSegment();
+                if (TextUtils.isEmpty(selection)) {
+                    affectedRows = db.update(Constants.ATTACHMENTS_TABLE, values, Constants.COL_ID + "=" + id, null);
+                } else {
+                    affectedRows = db.update(Constants.ATTACHMENTS_TABLE, values, Constants.COL_ID + "=" + id + " and " + selection, selectionArgs);
                 }
                 break;
             default:

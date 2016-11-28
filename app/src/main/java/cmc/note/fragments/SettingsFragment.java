@@ -19,6 +19,8 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings);
 
+        setHasOptionsMenu(true);
+
         findPreference("sync_open").setOnPreferenceClickListener(this);
         findPreference("sync_save").setOnPreferenceClickListener(this);
     }

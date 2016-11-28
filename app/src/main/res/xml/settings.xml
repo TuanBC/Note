@@ -2,6 +2,10 @@
 <PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/toolbar"/>
+
     <PreferenceCategory
         android:title="Sync Options"
         android:key="pref_key_storage_settings">

@@ -277,8 +277,6 @@ public class ChecklistEditorFragment extends Fragment {
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mCurrentItems.clear();
-                NoteManager.newInstance(getActivity()).delete(mCurrentNote);
                 getActivity().finish();
             }
         });

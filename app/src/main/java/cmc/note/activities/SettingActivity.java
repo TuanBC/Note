@@ -8,7 +8,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -31,6 +35,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import cmc.note.R;
 import cmc.note.fragments.SettingsFragment;
 
 /**
@@ -48,17 +53,43 @@ public class SettingActivity extends PreferenceActivity implements GoogleApiClie
     private DriveId mFileId;
     public DriveFile file;
     public PreferenceManager mPrefs;
+    public String actionbar_title;
+
+    private Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState == null) {
+            Bundle mArgs = getIntent().getExtras();
+            if (mArgs != null) {
+                this.actionbar_title = mArgs.getString("actionbar_title");
+            }
+        }
+
+//        this.setTitle(actionbar_title);
+
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
+                .addToBackStack(null)
                 .commit();
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
 
+        LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
+        Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.toolbar, root, false);
+        root.addView(bar, 0); // insert at top
+        bar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+    }
 
 
     /**
@@ -354,7 +385,7 @@ public class SettingActivity extends PreferenceActivity implements GoogleApiClie
 
     @Override
     public void onBackPressed() {
-//        this.getActionBar().setTitle("SETTING DONE");
         super.onBackPressed();
+        this.finish();
     }
 }

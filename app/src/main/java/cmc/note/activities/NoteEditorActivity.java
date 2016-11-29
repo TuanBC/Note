@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import cmc.note.R;
-import cmc.note.data.CategoryManager;
 import cmc.note.data.NoteManager;
 import cmc.note.fragments.ChecklistEditorFragment;
 import cmc.note.fragments.NoteLinedEditorFragment;
@@ -60,16 +59,7 @@ public class NoteEditorActivity extends MainActivity {
                     String type = mArgs.getString("type");
 
                     if (type.equals("note")) {
-                        Note note = new Note();
-                        note.setTitle("");
-                        note.setType("note");
-                        note.setCategoryId(CategoryManager.newInstance(this).getFirstCategory().getId());
-                        note.setContent("");
-                        NoteManager.newInstance(this).create(note);
-                        mCurrentNote = NoteManager.newInstance(this).getLastNote();
-
                         NoteLinedEditorFragment f = NoteLinedEditorFragment.newInstance(0);
-
                         f.setListOrder(mListOrder);
                         openFragment(f, "Editor");
                     } else if (type.equals("checklist")) {
@@ -82,12 +72,12 @@ public class NoteEditorActivity extends MainActivity {
                             Note note = new Note();
                             note.setTitle("");
                             note.setType("checklist");
-                            note.setCategoryId(CategoryManager.newInstance(this).getFirstCategory().getId());
                             note.setContent("");
                             NoteManager.newInstance(this).create(note);
-                            mCurrentNote = NoteManager.newInstance(this).getLastNote();
 
-                            ChecklistEditorFragment f = ChecklistEditorFragment.newInstance(0);
+                            Note temp_note = NoteManager.newInstance(this).getNoteByTitle("");
+
+                            ChecklistEditorFragment f = ChecklistEditorFragment.newInstance(temp_note.getId());
                             f.setListOrder(mListOrder);
                             openFragment(f, "Checklist");
                         }
@@ -101,12 +91,21 @@ public class NoteEditorActivity extends MainActivity {
 
     @Override
     public void onBackPressed() {
-        if (mCurrentNote.getType().equals("note")) {
-            NoteLinedEditorFragment fragment = (NoteLinedEditorFragment) getSupportFragmentManager().findFragmentById(R.id.container);
-            fragment.onBackClicked();
-        } else if (mCurrentNote.getType().equals("checklist")) {
-            ChecklistEditorFragment fragment = (ChecklistEditorFragment) getSupportFragmentManager().findFragmentById(R.id.container);
-            fragment.onBackClicked();
+        if (mCurrentNote==null) {
+            Note temp_note = NoteManager.newInstance(this).getLastNote();
+            if (temp_note.getTitle().equals("")) NoteManager.newInstance(this).delete(temp_note);
+            this.finish();
+            makeToast("null note");
+        }
+//        else if (mCurrentNote.getTitle().equals("")&&mCurrentNote.getContent().equals("")) this.finish();
+        else {
+            if (mCurrentNote.getType().equals("note")) {
+                NoteLinedEditorFragment fragment = (NoteLinedEditorFragment) getSupportFragmentManager().findFragmentById(R.id.container);
+                fragment.onBackClicked();
+            } else if (mCurrentNote.getType().equals("checklist")) {
+                ChecklistEditorFragment fragment = (ChecklistEditorFragment) getSupportFragmentManager().findFragmentById(R.id.container);
+                fragment.onBackClicked();
+            }
         }
     }
 

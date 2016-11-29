@@ -189,7 +189,7 @@ public class NoteManager {
     public Note getLastNote() {
         Note note;
         Cursor cursor = mContext.getContentResolver().query(NoteContentProvider.NOTE_URI,
-                Constants.NOTE_COLUMNS, null, null, Constants.COL_ID + " ASC ");
+                Constants.NOTE_COLUMNS, null, null, Constants.COL_MODIFIED_TIME + " DESC ");
         if (cursor != null){
             cursor.moveToFirst();
             note = Note.getNotefromCursor(cursor);

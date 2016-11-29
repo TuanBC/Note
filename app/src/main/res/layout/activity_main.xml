@@ -53,6 +53,12 @@
             android:id="@+id/btn_add_checklist"
             android:layout_weight="1"/>
 
+        <Button
+            android:text="Photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_add_photo"
+            android:layout_weight="1"/>
     </LinearLayout>
 
 </RelativeLayout>

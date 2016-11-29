@@ -43,17 +43,4 @@ public class Constants {
             Constants.COL_ID,
             Constants.COL_TITLE
     };
-
-    public static final String ATTACHMENTS_TABLE = "attachments";
-
-    public static final String COL_PATH = "path";
-    public static final String COL_ISIMAGE = "is_image";
-
-    public static final String[] ATTACHMENT_COLUMNS = {
-            Constants.COL_ID,
-            Constants.COL_NOTEID,
-            Constants.COL_PATH,
-            Constants.COL_ISIMAGE
-    };
-
 }

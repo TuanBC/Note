@@ -8,8 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
@@ -27,10 +25,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.context.IconicsLayoutInflater;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 import com.mikepenz.materialdrawer.util.KeyboardUtil;
@@ -52,12 +51,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        LayoutInflaterCompat.setFactory(getLayoutInflater(), new IconicsLayoutInflater(getDelegate()));
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this);
         databaseHelper.getWritableDatabase();
 
+        //ADD COMMAND TO GET mListOrder
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
         if (mToolbar != null)
            setSupportActionBar(mToolbar);
@@ -66,14 +68,20 @@ public class MainActivity extends AppCompatActivity {
             Bundle mArgs = getIntent().getExtras();
             if (mArgs!=null) {
                 mListOrder = mArgs.getString("list_order");
+                Log.i (TAG, "get order = "+mListOrder);
             }
+//            NoteListFragment fragment = new NoteListFragment();
+//            fragment.setListOrder(mListOrder);
+//            openFragment(fragment, "Note List");
         }
 
         findViewById(R.id.btn_add_note).setOnClickListener(button_listener);
         findViewById(R.id.btn_add_checklist).setOnClickListener(button_listener);
+        findViewById(R.id.btn_add_photo).setOnClickListener(button_listener);
         Button sort_button = (Button)findViewById(R.id.btn_set_order);
         sort_button.setOnClickListener(button_listener);
         if (mListOrder==null) {
+            Log.i(TAG," didn't receive list order");
             mListOrder = "modified_desc";
         }
 
@@ -89,18 +97,16 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
 
-        final PrimaryDrawerItem item1 = new PrimaryDrawerItem().withName(R.string.title_home).withIcon(ContextCompat.getDrawable(this, R.drawable.ic_notes)).withIdentifier(1);
-        final PrimaryDrawerItem item2 = new PrimaryDrawerItem().withName(R.string.title_category).withIcon(ContextCompat.getDrawable(this, R.drawable.ic_book)).withIdentifier(2);
-        final PrimaryDrawerItem item3 = new PrimaryDrawerItem().withName(R.string.title_setting).withIcon(ContextCompat.getDrawable(this, R.drawable.ic_setting)).withIdentifier(3).withSelectable(false);
-
         //Now build the navigation drawer and pass the AccountHeader
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(mToolbar)
                 .withActionBarDrawerToggle(true)
                 .addDrawerItems(
-                        item1,item2,item3
-                        )
+                        new PrimaryDrawerItem().withName(R.string.title_home).withIcon(FontAwesome.Icon.faw_sticky_note).withIdentifier(1),
+                        new PrimaryDrawerItem().withName(R.string.title_category).withIcon(FontAwesome.Icon.faw_book).withIdentifier(2),
+                        new PrimaryDrawerItem().withName(R.string.title_setting).withIcon(FontAwesome.Icon.faw_cog).withIdentifier(3).withSelectable(false)
+                )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
                     public boolean onItemClick(View view, int i, IDrawerItem drawerItem) {
@@ -127,13 +133,12 @@ public class MainActivity extends AppCompatActivity {
                                 case 3:
                                     //go to settings screen
                                     Intent intent = new Intent(MainActivity.this, SettingActivity.class);
-                                    String actionbar_title = getSupportActionBar().getTitle().toString();
-                                    intent.putExtra("actionbar_title", actionbar_title);
+                                    String action_bar_title = getSupportActionBar().getTitle().toString();
+                                    intent.putExtra("title", action_bar_title);
 //                                    intent.putExtra("list_order", mListOrder);
 
-                                    //FIX ACTION BAR TITLE
-
                                     startActivity(intent);
+                                    Toast.makeText(MainActivity.this, "Settings Clicked", Toast.LENGTH_SHORT).show();
                                     break;
                             }
                         }
@@ -154,13 +159,10 @@ public class MainActivity extends AppCompatActivity {
                     public void onDrawerSlide(View view, float v) {
                     }
                 })
+//                .withSelectedItem(-1)
                 .withFireOnInitialOnClick(true)
                 .withSavedInstance(savedInstanceState)
                 .build();
-    }
-
-    private void makeToast(String s) {
-        Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -175,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setTitle("Category List");
             result.setSelection(2, false);
             super.onBackPressed();
-        } else makeToast("Other type backpressed");
+        }
     }
 
     private void promptToExit() {
@@ -359,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
         Notification.Builder builder = new Notification.Builder(this)
                 .setContentTitle("Scheduled Notification")
                 .setContentText(content)
-                .setPriority(Notification.PRIORITY_MAX)
+                .setPriority(Notification.PRIORITY_HIGH)
                 .setSmallIcon(R.mipmap.ic_launcher);
         return builder.build();
     }

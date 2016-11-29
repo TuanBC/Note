@@ -26,12 +26,13 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile 'com.google.code.gson:gson:2.4'
     compile('com.mikepenz:materialdrawer:5.7.0@aar') {
         transitive = true
     }
     compile 'com.scalified:fab:1.1.3'
-//    compile 'com.mikepenz:fontawesome-typeface:4.7.0.0@aar'
-    compile 'com.google.android.gms:play-services:10.0.0'
+    compile 'com.mikepenz:fontawesome-typeface:4.7.0.0@aar'
+    compile 'com.google.android.gms:play-services:9.8.0'
 
     testCompile 'junit:junit:4.12'
 }

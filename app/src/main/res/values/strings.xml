@@ -10,7 +10,4 @@
     <string name="title_activity_note_editor">NoteEditor</string>
     <string name="search_hint">Search</string>
     <string name="sort">Sort by</string>
-    <string name="attach">Attach file</string>
-    <string name="cancel">Cancel</string>
-    <string name="choose_category">Choose Category</string>
 </resources>

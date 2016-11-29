@@ -49,15 +49,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + Constants.CATEGORIES_TABLE
             + " values (1, 'First notebook') ";
 
-    private static final String CREATE_TABLE_ATTACHMENT = "create table "
-            + Constants.ATTACHMENTS_TABLE
-            + "("
-            + Constants.COL_ID + " integer primary key autoincrement, "
-            + Constants.COL_NOTEID + " integer not null, "
-            + Constants.COL_PATH + " text not null, "
-            + Constants.COL_ISIMAGE + " integer not null "
-            + ")";
-
     private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -80,7 +71,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_CHECKLIST);
         db.execSQL(CREATE_TABLE_CATEGORY);
         db.execSQL(INSERT_FIRST_CATEGORY);
-        db.execSQL(CREATE_TABLE_ATTACHMENT);
     }
 
     @Override
@@ -88,7 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + Constants.NOTES_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + Constants.CL_TABLE);
         db.execSQL("DROP TABLE IF EXISTS " + Constants.CATEGORIES_TABLE);
-        db.execSQL("DROP TABLE IF EXISTS " + Constants.ATTACHMENTS_TABLE);
+
         onCreate(db);
     }
 }

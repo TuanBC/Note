@@ -1,9 +1,6 @@
 package cmc.note.models;
 
-import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.NonNull;
 
 import cmc.note.ultilities.Constants;
 
@@ -71,10 +68,10 @@ public class CheckItem {
     ////////////////////
     public static CheckItem getCheckItemfromCursor(Cursor cursor){
         CheckItem checkItem = new CheckItem();
-        checkItem.setId(cursor.getLong(cursor.getColumnIndex(Constants.CL_COL_ID)));
-        checkItem.setNoteId(cursor.getLong(cursor.getColumnIndex(Constants.CL_COL_NOTEID)));
-        checkItem.setName(cursor.getString(cursor.getColumnIndex(Constants.CL_COL_NAME)));
-        checkItem.setStatus(cursor.getInt(cursor.getColumnIndex(Constants.CL_COL_STATUS)) == 1);
+        checkItem.setId(cursor.getLong(cursor.getColumnIndex(Constants.COL_ID)));
+        checkItem.setNoteId(cursor.getLong(cursor.getColumnIndex(Constants.COL_NOTEID)));
+        checkItem.setName(cursor.getString(cursor.getColumnIndex(Constants.COL_TITLE)));
+        checkItem.setStatus(cursor.getInt(cursor.getColumnIndex(Constants.COL_STATUS)) == 1);
 
         return checkItem;
     }

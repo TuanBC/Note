@@ -1,8 +1,11 @@
 package cmc.note.fragments;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -13,15 +16,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import cmc.note.R;
 import cmc.note.activities.MainActivity;
+import cmc.note.activities.NoteEditorActivity;
 import cmc.note.data.NoteManager;
 import cmc.note.models.Note;
 
@@ -36,6 +43,11 @@ public class NoteLinedEditorFragment extends Fragment {
     private Note mCurrentNote;
     private TextView mTimeAgo;
     private TextView mModifiedTime;
+    private String mListOrder;
+
+    private Calendar date = null;
+
+    private final static String TAG = "NOTEEDITOR Fragment";
 
     public NoteLinedEditorFragment() {
         // Required empty public constructor
@@ -50,6 +62,27 @@ public class NoteLinedEditorFragment extends Fragment {
         mContentEditText = (EditText)mRootView.findViewById(R.id.edit_text_note);
         mTimeAgo = (TextView)mRootView.findViewById(R.id.time_ago);
         mModifiedTime = (TextView)mRootView.findViewById(R.id.modified_time);
+
+        mRootView.setFocusableInTouchMode(true);
+        mRootView.requestFocus();
+
+//        mRootView.setOnKeyListener( new View.OnKeyListener()
+//        {
+//            @Override
+//            public boolean onKey( View v, int keyCode, KeyEvent event )
+//            {
+//                if( keyCode != KeyEvent.FLAG_SOFT_KEYBOARD )
+//                {
+//                    getActivity().finish();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        } );
+
+        mRootView.findViewById(R.id.btn_category).setOnClickListener(button_listener);
+        mRootView.findViewById(R.id.btn_reminder).setOnClickListener(button_listener);
+
         return mRootView;
     }
 
@@ -60,6 +93,10 @@ public class NoteLinedEditorFragment extends Fragment {
         getCurrentNote();
     }
 
+    public void setListOrder(String s){
+        this.mListOrder=s;
+    }
+
     public static NoteLinedEditorFragment newInstance(long id){
         NoteLinedEditorFragment fragment = new NoteLinedEditorFragment();
 
@@ -67,7 +104,6 @@ public class NoteLinedEditorFragment extends Fragment {
             Bundle bundle = new Bundle();
             bundle.putLong("id", id);
             fragment.setArguments(bundle);
-            Log.i("NoteLinedEditorFragment", "done pushing id");
         }
 
         return fragment;
@@ -86,14 +122,14 @@ public class NoteLinedEditorFragment extends Fragment {
 
     private boolean saveNote(){
         String content = mContentEditText.getText().toString();
-        if (TextUtils.isEmpty(content)){
-            mContentEditText.setError("Content is required");
-            return false;
-        }
-
         String title = mTitleEditText.getText().toString();         //DEFAULT TITLE = CONTENT
         if (TextUtils.isEmpty(title)){
-            title=content;
+            title="Untitled Note";
+        }
+
+        if (date!=null){
+            MainActivity a = (MainActivity) getActivity();
+            a.scheduleNotification(a.getNotification(title), date.getTimeInMillis()-System.currentTimeMillis());
         }
 
         if (mCurrentNote != null){
@@ -102,6 +138,7 @@ public class NoteLinedEditorFragment extends Fragment {
             NoteManager.newInstance(getActivity()).update(mCurrentNote);
 
             Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.putExtra("list_order", mListOrder);
             startActivity(intent);
         }else {
             Note note = new Note();
@@ -111,6 +148,7 @@ public class NoteLinedEditorFragment extends Fragment {
             NoteManager.newInstance(getActivity()).create(note);
 
             Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.putExtra("list_order", mListOrder);
             startActivity(intent);
         }
         return true;
@@ -141,7 +179,7 @@ public class NoteLinedEditorFragment extends Fragment {
     }
 
     private static String getReadableDate(long date){
-        return new SimpleDateFormat("MMM dd, yyyy - h:mm a").format(new Date(date));
+        return new SimpleDateFormat("MMM dd, yyyy").format(new Date(date));
     }
 
     @Override
@@ -165,7 +203,7 @@ public class NoteLinedEditorFragment extends Fragment {
                 if (mCurrentNote != null){
                     promptForDelete();
                 }else {
-                    makeToast("Cannot delete note that has not been saved");
+                    getActivity().finish();
                 }
                 break;
         }
@@ -182,7 +220,10 @@ public class NoteLinedEditorFragment extends Fragment {
             public void onClick(DialogInterface dialog, int which) {
                 NoteManager.newInstance(getActivity()).delete(mCurrentNote);
                 makeToast(titleOfNoteTobeDeleted + "deleted");
-                startActivity(new Intent(getActivity(), MainActivity.class));
+
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                intent.putExtra("list_order", mListOrder);
+                startActivity(intent);
             }
         });
         alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -199,25 +240,90 @@ public class NoteLinedEditorFragment extends Fragment {
     }
 
     public void promptForDiscard(){
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle("Discard?");
-        alertDialog.setMessage("Are you sure you want to go back? All changes will be discarded");
-        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                getActivity().finish();
-            }
-        });
-        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        alertDialog.show();
+        if (mRootView.hasFocus())
+            getActivity().finish();
+        else {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+            alertDialog.setTitle("Discard?");
+            alertDialog.setMessage("Are you sure you want to go back? All changes will be discarded");
+            alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    getActivity().finish();
+                }
+            });
+            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            alertDialog.show();
+        }
     }
+
+    private View.OnClickListener button_listener = new View.OnClickListener() {
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.btn_reminder:
+
+                    //ADD SOME NOTICE TO USER THAT REMINDER SET
+
+                    if (date!=null) {
+                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+                        alertDialog.setTitle("Reminder");
+                        alertDialog.setMessage("What do you want to do?");
+                        alertDialog.setPositiveButton("Change", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                createDateTimePicker();
+                            }
+                        });
+                        alertDialog.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                date=null;
+                            }
+                        });
+                        alertDialog.show();
+                    } else createDateTimePicker();
+
+//                    TimePickerFragment newFragment = new TimePickerFragment();
+//
+//                    Bundle args = new Bundle();
+//                    if (mCurrentNote.getId()>0)
+//                        args.putString("note_title", mCurrentNote.getTitle());
+//                    else
+//                    newFragment.setArguments(args);
+//                    newFragment.show(getActivity().getFragmentManager(),"TimePicker");
+                    break;
+                case R.id.btn_category:
+                        //OPEN A DIALOG WITH CATEGORY LIST
+                    break;
+            }
+        }
+    };
 
     private void makeToast(String s) {
         Toast.makeText(getActivity(), s, Toast.LENGTH_SHORT).show();
+    }
+
+    private void createDateTimePicker(){
+        final Calendar currentDate = Calendar.getInstance();
+        date = Calendar.getInstance();
+        new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                date.set(year, monthOfYear, dayOfMonth);
+                new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        date.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        date.set(Calendar.MINUTE, minute);
+                        Log.v(TAG, "The choosen one " + date.getTime());
+                    }
+                }, currentDate.get(Calendar.HOUR_OF_DAY), currentDate.get(Calendar.MINUTE), false).show();
+            }
+        }, currentDate.get(Calendar.YEAR), currentDate.get(Calendar.MONTH), currentDate.get(Calendar.DATE)).show();
     }
 }

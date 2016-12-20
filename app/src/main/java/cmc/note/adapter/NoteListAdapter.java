@@ -1,7 +1,6 @@
 package cmc.note.adapter;
 
 import android.content.Context;
-import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +20,9 @@ import cmc.note.models.Note;
 */
 
 public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHolder>{
-
     private List<Note> mNotes;
     private Context mContext;
+//    private String mListOrder;
 
     public NoteListAdapter(List<Note> notes, Context context){
         mNotes = notes;
@@ -51,38 +50,15 @@ public class NoteListAdapter extends RecyclerView.Adapter<NoteListAdapter.ViewHo
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final TextView noteTitle, noteModifiedDate;
-        public final ImageView noteType;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final TextView noteTitle, noteModifiedDate;
+        final ImageView noteType;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             noteTitle = (TextView)itemView.findViewById(R.id.text_view_note_title);
             noteModifiedDate = (TextView)itemView.findViewById(R.id.text_view_note_date);
             noteType = (ImageView)itemView.findViewById(R.id.image_view_note_type);
-
-//            itemView.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    Log.d("log holder", getAdapterPosition() + "position clicked.");
-//
-//                    long position = getAdapterPosition();
-//                    Intent editorIntent = new Intent(mContext, NoteEditorActivity.class);
-//                    editorIntent.putExtra("id", position);
-//
-//
-//                    mContext.startActivity(editorIntent);
-//                }
-//            });
-//
-//            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-//
-//                @Override
-//                public boolean onLongClick(View view) {
-//                    Log.d("holder", "Element " + getAdapterPosition() + " long clicked.");
-//                    return true;
-//                }
-//            });
         }
     }
 

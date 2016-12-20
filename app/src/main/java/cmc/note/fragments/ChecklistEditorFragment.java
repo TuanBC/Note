@@ -53,6 +53,12 @@ public class ChecklistEditorFragment extends Fragment {
     private List<CheckItem> mCurrentItems = new ArrayList<>();
     private List<CheckItem> mAddedItems = new ArrayList<>();
 
+    private String mListOrder;
+
+    public void setListOrder(String s){
+        this.mListOrder=s;
+    }
+
     public ChecklistEditorFragment() {
         // Required empty public constructor
     }
@@ -160,16 +166,14 @@ public class ChecklistEditorFragment extends Fragment {
         }));
     }
 
-
-
-
     private boolean saveNote(){
         int size = mAddedItems.size();
 
         String title = mTitleEditText.getText().toString();
         if (TextUtils.isEmpty(title)){
-//            mTitleEditText.setError("Title required");
-            mCurrentNote.setTitle(getReadableDateWithoutHour(System.currentTimeMillis()));
+            mTitleEditText.setError("Title required");
+//            mCurrentNote.setTitle(getReadableDateWithoutHour(System.currentTimeMillis()));
+            return false;
         }
 
 
@@ -190,6 +194,7 @@ public class ChecklistEditorFragment extends Fragment {
             mAddedItems.clear();
 
             Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.putExtra("list_order", mListOrder);
             startActivity(intent);
         }else {
             if (size==0){
@@ -247,7 +252,9 @@ public class ChecklistEditorFragment extends Fragment {
                 ChecklistManager.newInstance(getActivity()).deleteByNoteId(mCurrentNote.getId());
 
                 makeToast(titleOfNoteTobeDeleted + "deleted");
-                startActivity(new Intent(getActivity(), MainActivity.class));
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                intent.putExtra("list_order", mListOrder);
+                startActivity(intent);
             }
         });
         alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -271,6 +278,7 @@ public class ChecklistEditorFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 mCurrentItems.clear();
+                NoteManager.newInstance(getActivity()).delete(mCurrentNote);
                 getActivity().finish();
             }
         });

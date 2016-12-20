@@ -1,6 +1,7 @@
 package cmc.note.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,8 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import cmc.note.R;
@@ -38,10 +37,13 @@ public class ChecklistOptionsListAdapter extends RecyclerView.Adapter<ChecklistO
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.itemName.setText(mCheckItems.get(position).getName());
-        if (mCheckItems.get(position).getStatus()){
+        if (mCheckItems.get(position).getStatus()) {
+            holder.itemName.setTextColor(Color.GRAY);
             holder.itemName.setPaintFlags(holder.itemName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-        } else
+        } else{
             holder.itemName.setPaintFlags(0);
+            holder.itemName.setTextColor(Color.BLACK);
+        }
     }
 
     @Override
@@ -50,34 +52,11 @@ public class ChecklistOptionsListAdapter extends RecyclerView.Adapter<ChecklistO
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final TextView itemName;
-        public ViewHolder(View itemView) {
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final TextView itemName;
+        ViewHolder(View itemView) {
             super(itemView);
             itemName = (TextView)itemView.findViewById(R.id.text_view_item_name);
-    //            itemView.setOnClickListener(new View.OnClickListener() {
-    //                @Override
-    //                public void onClick(View view) {
-    //                    Log.d("log holder", getAdapterPosition() + "position clicked.");
-    //
-    //                    long position = getAdapterPosition();
-    //                    Intent editorIntent = new Intent(mContext, NoteEditorActivity.class);
-    //                    editorIntent.putExtra("id", position);
-    //
-    //
-    //                    mContext.startActivity(editorIntent);
-    //                }
-    //            });
-    //
-    //            itemView.setOnLongClickListener(new View.OnLongClickListener() {
-    //
-    //                @Override
-    //                public boolean onLongClick(View view) {
-    //                    Log.d("holder", "Element " + getAdapterPosition() + " long clicked.");
-    //                    return true;
-    //                }
-    //            });
-
         }
     }
 
